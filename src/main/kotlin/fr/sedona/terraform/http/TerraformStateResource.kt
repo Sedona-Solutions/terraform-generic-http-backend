@@ -3,6 +3,7 @@ package fr.sedona.terraform.http
 import com.fasterxml.jackson.databind.ObjectMapper
 import fr.sedona.terraform.http.annotation.LOCK
 import fr.sedona.terraform.http.annotation.UNLOCK
+import fr.sedona.terraform.http.exception.ConflictException
 import fr.sedona.terraform.http.exception.LockedException
 import fr.sedona.terraform.http.exception.ResourceNotFoundException
 import fr.sedona.terraform.http.extension.toInternal
@@ -17,6 +18,7 @@ import javax.enterprise.inject.Default
 import javax.inject.Inject
 import javax.ws.rs.*
 import javax.ws.rs.core.MediaType
+import javax.ws.rs.core.Response
 
 
 @Path("/tf-state")
@@ -43,12 +45,11 @@ class TerraformStateResource {
         @PathParam("project") project: String
     ): TfState {
         logger.fine("Received GET for TF state of project $project")
-        val result = tfStateRepository.findByIdOptional(project)
-        if (result.isEmpty) {
+        try {
+            return tfStateRepository.findByIdOptional(project).get().toTerraform()
+        } catch (e: NoSuchElementException) {
             throw ResourceNotFoundException(project)
         }
-
-        return result.get().toTerraform()
     }
 
     @POST
@@ -93,16 +94,17 @@ class TerraformStateResource {
         @PathParam("project") project: String
     ) {
         logger.fine("Received DELETE for TF state of project $project")
-        val storedState = tfStateRepository.findById(project)
-        if (storedState == null) {
-            logger.fine("State for project $project does not exist -> throwing exception")
-            throw ResourceNotFoundException(project)
-        } else {
+        try {
+            val storedState = tfStateRepository.findByIdOptional(project).get()
+
             logger.fine("State for project $project exists -> verifying lock before deleting state")
             ensureStateIsNotLocked(storedState)
 
             logger.fine("State for project $project is not locked -> deleting state")
             doDeleteState(storedState)
+        } catch (e: NoSuchElementException) {
+            logger.warning("State for project $project does not exist -> throwing exception")
+            throw ResourceNotFoundException(project)
         }
         // TODO Check what to return to Terraform
     }
@@ -116,46 +118,86 @@ class TerraformStateResource {
     @LOCK
     @Path("/{project}")
     fun lockState(
-        @PathParam("project") project: String
-    ): TfLockInfo? {
+        @PathParam("project") project: String,
+        lockInfo: TfLockInfo
+    ): Response {
         logger.fine("Received LOCK for TF state of project $project")
-        return doLockState(project)
+        return doLockState(project, lockInfo)
     }
 
     @POST
     @Path("/{project}/lock")
     fun lockStateAlternative(
-        @PathParam("project") project: String
-    ): TfLockInfo? {
+        @PathParam("project") project: String,
+        lockInfo: TfLockInfo
+    ): Response {
         logger.fine("Received POST to lock TF state of project $project")
-        return doLockState(project)
+        return doLockState(project, lockInfo)
     }
 
-    private fun doLockState(project: String): TfLockInfo? {
-        // TODO: implement lock mechanism
-        return null
+    private fun doLockState(project: String, lockInfo: TfLockInfo): Response {
+        logger.fine("Verifying if state of project $project is already locked")
+        val objectMapper = ObjectMapper()
+        try {
+            // If a lock already exists, return HTTP 'locked' response
+            val storedStateWithLock = tfStateRepository.findByLockId(lockInfo.id!!).get()
+
+            logger.warning("State of project $project is already locked -> returning HTTP locked response")
+
+            throw LockedException(objectMapper.readValue(storedStateWithLock.lockInfo, TfLockInfo::class.java))
+        } catch (e: NoSuchElementException) {
+            logger.fine("State of project $project has no lock -> locking state")
+            tfStateRepository.lockState(project, lockInfo.id!!, objectMapper.writeValueAsString(lockInfo))
+            logger.info("State of project $project locked successfully")
+            return Response.ok()
+                .build()
+        }
     }
 
     @UNLOCK
     @Path("/{project}")
     fun unlockState(
-        @PathParam("project") project: String
-    ): TfLockInfo? {
+        @PathParam("project") project: String,
+        lockInfo: TfLockInfo
+    ): Response {
         logger.fine("Received UNLOCK for TF state of project $project")
-        return doUnlockState(project)
+        return doUnlockState(project, lockInfo)
     }
 
     @POST
     @Path("/{project}/unlock")
     fun unlockStateAlternative(
-        @PathParam("project") project: String
-    ): TfLockInfo? {
+        @PathParam("project") project: String,
+        lockInfo: TfLockInfo
+    ): Response {
         logger.fine("Received POST to unlock TF state of project $project")
-        return doUnlockState(project)
+        return doUnlockState(project, lockInfo)
     }
 
-    private fun doUnlockState(project: String): TfLockInfo? {
-        // TODO: implement unlock mechanism
-        return null
+    private fun doUnlockState(project: String, lockInfo: TfLockInfo): Response {
+        logger.fine("Verifying if state of project $project is locked")
+        val objectMapper = ObjectMapper()
+        try {
+            // If a lock still exist, unlock the state
+            val storedState = tfStateRepository.findByIdOptional(project).get()
+            if (!storedState.locked) {
+                logger.warning("State of project $project exists but is not locked -> returning an error")
+                throw NoSuchElementException()
+            }
+
+            if (storedState.lockId != lockInfo.id) {
+                logger.warning("State of project $project is locked by someone else -> returning HTTP locked response")
+                throw LockedException(objectMapper.readValue(storedState.lockInfo, TfLockInfo::class.java))
+            }
+
+            logger.fine("State of project $project is locked -> unlocking state")
+            tfStateRepository.unlockState(project, storedState)
+            logger.info("State of project $project unlocked successfully")
+            return Response.ok()
+                .build()
+        } catch (e: NoSuchElementException) {
+            logger.warning("State of project $project is already unlocked -> returning HTTP conflict response")
+            throw ConflictException(lockInfo)
+        }
     }
 }

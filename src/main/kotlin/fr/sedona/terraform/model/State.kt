@@ -11,6 +11,7 @@ class State {
     var name: String? = null
     var lastModified: Date? = null
     var locked: Boolean = false
+    var lockId: String? = null
     var lockInfo: String? = null
     var version: Number = 0
     var tfVersion: String? = null

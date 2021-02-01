@@ -12,6 +12,7 @@ fun TfState.toInternal(): State {
     state.name = this.name
     state.lastModified = this.lastModified
     state.locked = this.locked
+    state.lockId = this.lock?.id
     state.lockInfo = this.lock?.toInternal(objectMapper)
     state.version = this.version
     state.tfVersion = this.tfVersion

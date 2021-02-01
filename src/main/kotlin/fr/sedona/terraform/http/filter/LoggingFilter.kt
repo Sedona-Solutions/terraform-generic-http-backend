@@ -11,6 +11,7 @@ class LoggingFilter : ContainerRequestFilter {
     private val logger = Logger.getLogger(LoggingFilter::class.java.toString())
 
     override fun filter(context: ContainerRequestContext) {
-        logger.fine("Received request ${context.method} ${context.uriInfo.path}")
+        logger.info("Received request ${context.method} ${context.uriInfo.path}")
+        logger.info("${context.uriInfo.queryParameters}")
     }
 }
