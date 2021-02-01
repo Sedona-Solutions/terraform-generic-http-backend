@@ -1,0 +1,101 @@
+version: "3.8"
+services:
+  ##
+  # MariaDB 10.5
+  ##
+  mariadb105:
+    image: mariadb:10.5
+    environment:
+      - MYSQL_DATABASE=terraform
+      - MYSQL_ROOT_PASSWORD=root
+    ports:
+      - "3306:3306"
+
+  ##
+  # MariaDB 10.4
+  ##
+#  mariadb104:
+#    image: mariadb:10.4
+#    environment:
+#      - MYSQL_DATABASE=terraform
+#      - MYSQL_ROOT_PASSWORD=root
+#    ports:
+#      - "3306:3306"
+
+  ##
+  # MySQL 8.0
+  ##
+#  mysql80:
+#    image: mysql:8.0
+#    environment:
+#      - MYSQL_DATABASE=terraform
+#      - MYSQL_ROOT_PASSWORD=root
+#    ports:
+#      - "3306:3306"
+
+  ##
+  # MySQL 5.7
+  ##
+#  mysql57:
+#    image: mysql:5.7
+#    environment:
+#      - MYSQL_DATABASE=terraform
+#      - MYSQL_ROOT_PASSWORD=root
+#    ports:
+#      - "3306:3306"
+
+  ##
+  # PostgreSQL 13
+  ##
+#  postgres13:
+#    image: postgres:13
+#    environment:
+#      - POSTGRES_DB=terraform
+#      - POSTGRES_PASSWORD=root
+#    ports:
+#      - "5432:5432"
+
+  ##
+  # PostgreSQL 12
+  ##
+#  postgres12:
+#    image: postgres:12
+#    environment:
+#      - POSTGRES_DB=terraform
+#      - POSTGRES_PASSWORD=root
+#    ports:
+#      - "5432:5432"
+
+  ##
+  # MS SQL Server 2017
+  ##
+#  mssql2017:
+#    image: mcr.microsoft.com/mssql/server:2017-latest
+#    environment:
+#      - ACCEPT_EULA=Y
+#      - SA_PASSWORD=root
+#      - MSSQL_PID=Developer
+#    ports:
+#      - "1433:1433"
+#  mssqlscripts2017:
+#    image: mcr.microsoft.com/mssql-tools
+#    command: /bin/bash -c 'until /opt/mssql-tools/bin/sqlcmd -S mssql -U sa -P "root" -Q "create database terraform"; do sleep 5; done'
+#    depends_on:
+#      - mssql2017
+
+  ##
+  # MS SQL Server 2019
+  ##
+#  mssql2019:
+#    image: mcr.microsoft.com/mssql/server:2019-latest
+#    environment:
+#      - ACCEPT_EULA=Y
+#      - SA_PASSWORD=root
+#      - MSSQL_PID=Developer
+#    ports:
+#      - "1433:1433"
+#  mssqlscripts2019:
+#    image: mcr.microsoft.com/mssql-tools
+#    command: /bin/bash -c 'until /opt/mssql-tools/bin/sqlcmd -S mssql -U sa -P "root" -Q "create database terraform"; do sleep 5; done'
+#    depends_on:
+#      - mssql2019
