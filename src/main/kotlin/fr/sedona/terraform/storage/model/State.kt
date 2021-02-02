@@ -7,24 +7,24 @@ import javax.persistence.Id
 
 
 @Entity
-class State {
+open class State {
     @Id
-    var name: String? = null
+    open var name: String? = null
 
-    var lastModified: Date? = null
+    open var lastModified: Date? = null
 
-    var locked: Boolean = false
+    open var locked: Boolean = false
 
-    var lockId: String? = null
+    open var lockId: String? = null
 
-    var lockInfo: String? = null
+    open var lockInfo: String? = null
 
-    var version: Int = 4
+    open var version: Int = 4
 
-    var tfVersion: String? = null
+    open var tfVersion: String? = null
 
-    var serial: Int = 1
+    open var serial: Int = 1
 
     @Column(columnDefinition = "TEXT")
-    var state: String? = null
+    open var state: String? = null
 }
