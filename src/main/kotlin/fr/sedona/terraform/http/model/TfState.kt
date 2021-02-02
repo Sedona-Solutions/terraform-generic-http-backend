@@ -1,24 +1,11 @@
 package fr.sedona.terraform.http.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import java.util.*
 
 /**
  * TfState is a Terraform state
  */
 data class TfState(
-    // FIXME LastModified time.Time `json:"last_modified"`
-    @JsonProperty("last_modified")
-    var lastModified: Date,
-
-    var name: String,
-
-    /**
-     * Keep lock info
-     */
-    var locked: Boolean,
-    var lock: TfLockInfo?,
-
     /**
      * Version is the state file protocol version.
      */
@@ -47,21 +34,7 @@ data class TfState(
      */
     var lineage: String?,
 
-    /**
-     * Remote is used to track the metadata required to
-     * pull and push state files from a remote storage endpoint.
-     */
-    var remote: TfRemoteState?,
+    val outputs: Map<String, Any>?,
 
-    /**
-     * Backend tracks the configuration for the backend in use with
-     * this state. This is used to track any changes in the backend
-     * configuration.
-     */
-    val backend: TfBackendState?,
-
-    /**
-     * Modules contains all the modules in a breadth-first order
-     */
-    val modules: List<TfModuleState>?
+    val resources: List<Any>?
 )

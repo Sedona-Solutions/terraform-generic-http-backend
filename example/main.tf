@@ -19,5 +19,5 @@ terraform {
 
 resource "local_file" "foo" {
   filename = "${path.root}/test.txt"
-  content = "bar!"
+  content = "foobar!"
 }

@@ -2,6 +2,8 @@ package fr.sedona.terraform.http.exception
 
 import fr.sedona.terraform.http.model.TfLockInfo
 
+class BadRequestException : RuntimeException()
+
 class ResourceNotFoundException(
     val name: String
 ) : RuntimeException()
