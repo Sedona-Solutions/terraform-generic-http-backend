@@ -1,4 +1,4 @@
-package fr.sedona.terraform.model
+package fr.sedona.terraform.storage.model
 
 import java.util.*
 import javax.persistence.Column

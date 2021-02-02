@@ -1,9 +1,9 @@
-package fr.sedona.terraform.repository
+package fr.sedona.terraform.storage.database.repository
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import fr.sedona.terraform.http.model.TfLockInfo
 import fr.sedona.terraform.http.model.TfState
-import fr.sedona.terraform.model.State
+import fr.sedona.terraform.storage.model.State
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase
 import org.jboss.logging.Logger
 import java.util.*
@@ -16,15 +16,6 @@ class TerraformStateRepository(
     private val objectMapper: ObjectMapper
 ) : PanacheRepositoryBase<State, String> {
     private val logger = Logger.getLogger(TerraformStateRepository::class.java)
-
-    fun findByLockId(lockId: String): Optional<State> {
-        return find("lockId", lockId)
-            .firstResultOptional<State>()
-    }
-
-    override fun findById(project: String): State {
-        return findByIdOptional(project).get()
-    }
 
     @Transactional
     fun add(stateToSave: State) {
