@@ -13,12 +13,12 @@ import fr.sedona.terraform.http.model.TfState
 import fr.sedona.terraform.model.State
 import fr.sedona.terraform.repository.TerraformStateRepository
 import java.util.logging.Logger
-import java.util.stream.Collectors
 import javax.enterprise.inject.Default
 import javax.inject.Inject
 import javax.ws.rs.*
 import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.Response
+import kotlin.streams.toList
 
 
 @Path("/tf-state")
@@ -36,7 +36,7 @@ class TerraformStateResource {
         logger.fine("Received GET for all TF states")
         return tfStateRepository.streamAll()
             .map { it.toTerraform() }
-            .collect(Collectors.toList())
+            .toList()
     }
 
     @GET

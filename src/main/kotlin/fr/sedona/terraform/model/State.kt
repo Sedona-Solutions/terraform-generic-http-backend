@@ -13,9 +13,9 @@ class State {
     var locked: Boolean = false
     var lockId: String? = null
     var lockInfo: String? = null
-    var version: Number = 0
+    var version: Int = 0
     var tfVersion: String? = null
-    var serial: Number = 0
+    var serial: Int = 0
     var lineage: String? = null
     var remote: String? = null
     var backend: String? = null
