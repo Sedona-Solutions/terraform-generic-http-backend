@@ -2,9 +2,10 @@ package fr.sedona.terraform.http.extension
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
+import fr.sedona.terraform.config.CustomObjectMapperCustomizer
 import fr.sedona.terraform.http.model.*
 import fr.sedona.terraform.model.State
-import java.util.*
+import java.util.Date
 
 fun TfState.toInternal(): State {
     val objectMapper = ObjectMapper()
@@ -20,7 +21,7 @@ fun TfState.toInternal(): State {
     state.lineage = this.lineage
     state.remote = this.remote?.toInternal(objectMapper)
     state.backend = this.backend?.toInternal(objectMapper)
-    state.modules = this.modules.toInternal(objectMapper)
+    state.modules = this.modules?.toInternal(objectMapper)
     return state
 }
 
@@ -42,17 +43,18 @@ fun List<TfModuleState>.toInternal(objectMapper: ObjectMapper): String {
 
 fun State.toTerraform(): TfState {
     val objectMapper = ObjectMapper()
+    CustomObjectMapperCustomizer.customize(objectMapper)
     return TfState(
         lastModified = this.lastModified ?: Date(),
         name = this.name ?: "N/A",
         locked = this.locked,
-        lock = objectMapper.readValue(this.lockInfo, TfLockInfo::class.java),
+        lock = this.lockInfo?.let { objectMapper.readValue(it, TfLockInfo::class.java) },
         version = this.version,
         tfVersion = this.tfVersion,
         serial = this.serial,
         lineage = this.lineage,
-        remote = objectMapper.readValue(this.remote, TfRemoteState::class.java),
-        backend = objectMapper.readValue(this.backend, TfBackendState::class.java),
-        modules = objectMapper.readValue(this.modules, object : TypeReference<List<TfModuleState>>() {})
+        remote = this.remote?.let { objectMapper.readValue(it, TfRemoteState::class.java) },
+        backend = this.backend?.let { objectMapper.readValue(it, TfBackendState::class.java) },
+        modules = this.modules?.let { objectMapper.readValue(it, object : TypeReference<List<TfModuleState>>() {}) }
     )
 }

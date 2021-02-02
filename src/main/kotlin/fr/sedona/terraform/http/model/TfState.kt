@@ -22,7 +22,7 @@ data class TfState(
     /**
      * Version is the state file protocol version.
      */
-    var version: Number,
+    var version: Int,
 
     /**
      * TFVersion is the version of Terraform that wrote this state.
@@ -35,7 +35,7 @@ data class TfState(
      * the State file. It is used to detect potentially conflicting
      * updates.
      */
-    var serial: Number,
+    var serial: Int,
 
     /**
      * Lineage is set when a new, blank state is created and then
@@ -63,5 +63,5 @@ data class TfState(
     /**
      * Modules contains all the modules in a breadth-first order
      */
-    val modules: List<TfModuleState>
+    val modules: List<TfModuleState>?
 )
