@@ -55,6 +55,7 @@ class TerraformStateResource(
                 .toTerraform(objectMapper)
 
         } catch (e: NoSuchElementException) {
+            logger.warn("State for project $project does not exist -> returning resource not found error")
             throw ResourceNotFoundException(project)
         }
     }
@@ -79,7 +80,7 @@ class TerraformStateResource(
         lockId: String,
         state: TfState
     ): Response {
-        logger.info("Updating state for project $project with lock id $lockId")
+        logger.info("Updating state for project $project with lock $lockId")
         try {
             val storedState = tfStateRepository.findById(project)
 
@@ -101,7 +102,7 @@ class TerraformStateResource(
             throw BadRequestException()
 
         } catch (e: StateLockMismatchException) {
-            logger.warn("State for project $project is already locked by someone else")
+            logger.warn("State for project $project is already locked by someone else -> returning locked error")
             throw LockedException(e.lockInfo)
         }
 
@@ -113,7 +114,7 @@ class TerraformStateResource(
         project: String,
         state: TfState
     ): Response {
-        logger.info("Updating state for project $project without lock id")
+        logger.info("Updating state for project $project without lock")
         try {
             tfStateRepository.findById(project)
 
@@ -147,7 +148,7 @@ class TerraformStateResource(
             return Response.ok()
                 .build()
         } catch (e: NoSuchElementException) {
-            logger.warn("State for project $project does not exist -> throwing exception")
+            logger.warn("State for project $project does not exist -> returning resource not found error")
             throw ResourceNotFoundException(project)
         }
     }
@@ -173,7 +174,7 @@ class TerraformStateResource(
     }
 
     private fun doLockState(project: String, lockInfo: TfLockInfo): Response {
-        logger.debug("Verifying if state of project $project is already locked")
+        logger.debug("Locking state of project $project with lock ${lockInfo.id} -> verifying that state exists")
         try {
             val storedState = tfStateRepository.findById(project)
 
@@ -193,7 +194,7 @@ class TerraformStateResource(
                 .build()
 
         } catch (e: StateAlreadyLockedException) {
-            logger.warn("State of project $project is already locked -> returning HTTP locked response")
+            logger.warn("State of project $project is already locked -> returning locked error")
             throw LockedException(e.lockInfo)
         }
     }
@@ -202,24 +203,32 @@ class TerraformStateResource(
     @Path("/{project}")
     fun unlockState(
         @PathParam("project") project: String,
-        lockInfo: TfLockInfo
+        lockInfo: TfLockInfo?
     ): Response {
         logger.debug("Received UNLOCK for TF state of project $project")
-        return doUnlockState(project, lockInfo)
+        return if (lockInfo != null) {
+            doUnlockState(project, lockInfo)
+        } else {
+            doForceUnlockState(project)
+        }
     }
 
     @POST
     @Path("/{project}/unlock")
     fun unlockStateAlternative(
         @PathParam("project") project: String,
-        lockInfo: TfLockInfo
+        lockInfo: TfLockInfo?
     ): Response {
         logger.debug("Received POST to unlock TF state of project $project")
-        return doUnlockState(project, lockInfo)
+        return if (lockInfo != null) {
+            doUnlockState(project, lockInfo)
+        } else {
+            doForceUnlockState(project)
+        }
     }
 
     private fun doUnlockState(project: String, lockInfo: TfLockInfo): Response {
-        logger.debug("Verifying if state of project $project is locked")
+        logger.info("Unlock state for project $project with lock ${lockInfo.id} -> verifying that state exists")
         try {
             val storedState = tfStateRepository.findById(project)
 
@@ -236,16 +245,33 @@ class TerraformStateResource(
                 .build()
 
         } catch (e: NoSuchElementException) {
-            logger.warn("State of project $project is already unlocked -> returning HTTP conflict response")
+            logger.warn("State of project $project is already unlocked -> returning conflict error")
             throw ConflictException(lockInfo)
 
         } catch (e: StateNotLockedException) {
-            logger.warn("State of project $project exists but is not locked -> returning HTTP conflict response")
+            logger.warn("State of project $project exists but is not locked -> returning conflict error")
             throw ConflictException(lockInfo)
 
         } catch (e: StateLockMismatchException) {
-            logger.warn("State of project $project is locked by someone else -> returning HTTP locked response")
+            logger.warn("State of project $project is locked by someone else -> returning locked error")
             throw LockedException(e.lockInfo)
+        }
+    }
+
+    private fun doForceUnlockState(project: String): Response {
+        logger.info("Forcing unlock state for project $project -> verifying that state exists")
+        try {
+            val storedState = tfStateRepository.findById(project)
+
+            logger.debug("State of project $project exists -> unlocking state")
+            tfStateRepository.unlock(project, storedState)
+
+            return Response.ok()
+                .build()
+
+        } catch (e: NoSuchElementException) {
+            logger.warn("State of project $project does not exist -> returning bad request error")
+            throw BadRequestException()
         }
     }
 
