@@ -38,4 +38,7 @@ nb-configuration.xml
 # Local environment
 .env
 
+# Terraform files + test file
 .terraform
+.terraform.lock.hcl
+test.txt
