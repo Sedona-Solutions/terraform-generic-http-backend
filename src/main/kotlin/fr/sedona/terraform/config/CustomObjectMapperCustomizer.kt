@@ -8,7 +8,7 @@ import io.quarkus.jackson.ObjectMapperCustomizer
 import javax.inject.Singleton
 
 @Singleton
-object CustomObjectMapperCustomizer : ObjectMapperCustomizer {
+class CustomObjectMapperCustomizer : ObjectMapperCustomizer {
     override fun customize(objectMapper: ObjectMapper) {
         // Includes only non-null fields
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
