@@ -27,10 +27,7 @@ class StorageConfig {
 
     @Produces
     @IfBuildProperty(name = "application.storage.adapter", stringValue = "elastic")
-    fun elasticStorageAdapter(
-        repository: TerraformStateRepository,
-        objectMapper: ObjectMapper
-    ): StorageAdapter {
+    fun elasticStorageAdapter(): StorageAdapter {
         logger.info("Using elastic storage adapter")
         return ElasticAdapter()
     }
