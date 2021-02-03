@@ -3,7 +3,7 @@ package fr.sedona.terraform.http
 import com.fasterxml.jackson.databind.ObjectMapper
 import fr.sedona.terraform.http.annotation.LOCK
 import fr.sedona.terraform.http.annotation.UNLOCK
-import fr.sedona.terraform.http.extension.toTerraform
+import fr.sedona.terraform.util.toTerraform
 import fr.sedona.terraform.http.model.TfLockInfo
 import fr.sedona.terraform.http.model.TfState
 import fr.sedona.terraform.storage.adapter.StorageAdapter

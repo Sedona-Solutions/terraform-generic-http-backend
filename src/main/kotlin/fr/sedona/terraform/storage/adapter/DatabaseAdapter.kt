@@ -7,10 +7,10 @@ import fr.sedona.terraform.exception.StateNotLockedException
 import fr.sedona.terraform.http.exception.ConflictException
 import fr.sedona.terraform.http.exception.LockedException
 import fr.sedona.terraform.http.exception.ResourceNotFoundException
-import fr.sedona.terraform.http.extension.ensureIsLocked
-import fr.sedona.terraform.http.extension.ensureIsNotLocked
-import fr.sedona.terraform.http.extension.ensureLockOwnership
-import fr.sedona.terraform.http.extension.toInternal
+import fr.sedona.terraform.util.ensureIsLocked
+import fr.sedona.terraform.util.ensureIsNotLocked
+import fr.sedona.terraform.util.ensureLockOwnership
+import fr.sedona.terraform.util.toInternal
 import fr.sedona.terraform.http.model.TfLockInfo
 import fr.sedona.terraform.http.model.TfState
 import fr.sedona.terraform.storage.database.repository.TerraformStateRepository

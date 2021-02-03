@@ -1,4 +1,4 @@
-package fr.sedona.terraform.http.extension
+package fr.sedona.terraform.util
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import fr.sedona.terraform.exception.StateAlreadyLockedException
