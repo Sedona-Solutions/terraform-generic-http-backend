@@ -99,3 +99,23 @@ services:
 #    command: /bin/bash -c 'until /opt/mssql-tools/bin/sqlcmd -S mssql -U sa -P "root" -Q "create database terraform"; do sleep 5; done'
 #    depends_on:
 #      - mssql2019
+
+  ##
+  # ElasticSearch 7.x
+  ##
+#  elasticsearch7:
+#    image: elasticsearch:7.10.1
+#    environment:
+#      - discovery.type=single-node
+#    ports:
+#      - 9200:9200
+
+  ##
+  # ElasticSearch 6.x
+  ##
+#  elasticsearch6:
+#    image: elasticsearch:6.8.13
+#    environment:
+#      - discovery.type=single-node
+#    ports:
+#      - 9200:9200
