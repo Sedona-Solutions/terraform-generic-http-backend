@@ -47,30 +47,11 @@ class TerraformStateResource(
         state: TfState
     ): Response {
         logger.debug("Received POST for TF state of project $project")
-        return if (lockId != null) {
-            updateStateWithLock(project, lockId, state)
+        if (lockId != null) {
+            storageAdapter.updateWithLock(project, lockId, state)
         } else {
-            updateStateWithoutLockId(project, state)
+            storageAdapter.updateWithoutLock(project, state)
         }
-    }
-
-    private fun updateStateWithLock(
-        project: String,
-        lockId: String,
-        state: TfState
-    ): Response {
-        logger.info("Updating state for project $project with lock $lockId")
-        storageAdapter.updateWithLock(project, lockId, state)
-        return Response.ok()
-            .build()
-    }
-
-    private fun updateStateWithoutLockId(
-        project: String,
-        state: TfState
-    ): Response {
-        logger.info("Updating state for project $project without lock")
-        storageAdapter.updateWithoutLock(project, state)
         return Response.ok()
             .build()
     }
@@ -119,11 +100,7 @@ class TerraformStateResource(
         lockInfo: TfLockInfo?
     ): Response {
         logger.debug("Received UNLOCK for TF state of project $project")
-        return if (lockInfo != null) {
-            doUnlockState(project, lockInfo)
-        } else {
-            doForceUnlockState(project)
-        }
+        return doUnlockState(project, lockInfo)
     }
 
     @POST
@@ -133,21 +110,15 @@ class TerraformStateResource(
         lockInfo: TfLockInfo?
     ): Response {
         logger.debug("Received POST to unlock TF state of project $project")
-        return if (lockInfo != null) {
-            doUnlockState(project, lockInfo)
+        return doUnlockState(project, lockInfo)
+    }
+
+    private fun doUnlockState(project: String, lockInfo: TfLockInfo?): Response {
+        if (lockInfo != null) {
+            storageAdapter.unlock(project, lockInfo)
         } else {
-            doForceUnlockState(project)
+            storageAdapter.forceUnlock(project)
         }
-    }
-
-    private fun doUnlockState(project: String, lockInfo: TfLockInfo): Response {
-        storageAdapter.unlock(project, lockInfo)
-        return Response.ok()
-            .build()
-    }
-
-    private fun doForceUnlockState(project: String): Response {
-        storageAdapter.forceUnlock(project)
         return Response.ok()
             .build()
     }

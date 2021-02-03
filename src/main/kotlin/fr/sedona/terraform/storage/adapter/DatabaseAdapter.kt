@@ -41,6 +41,7 @@ class DatabaseAdapter(
     }
 
     override fun updateWithLock(project: String, lockId: String, state: TfState) {
+        logger.info("Updating state for project $project with lock $lockId")
         try {
             val storedState = repository.findByIdOptional(project).get()
 
@@ -68,6 +69,7 @@ class DatabaseAdapter(
     }
 
     override fun updateWithoutLock(project: String, state: TfState) {
+        logger.info("Updating state for project $project without lock")
         try {
             repository.findByIdOptional(project).get()
 
