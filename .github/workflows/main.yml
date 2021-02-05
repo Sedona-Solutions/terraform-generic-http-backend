@@ -1,0 +1,30 @@
+name: terraform-generic-http-backend
+
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checking out repository
+        uses: actions/checkout@v2
+
+      - name: Setting up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      - name: Caching Maven packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: Building and verifying package
+        run: mvn --batch-mode --update-snapshots package
