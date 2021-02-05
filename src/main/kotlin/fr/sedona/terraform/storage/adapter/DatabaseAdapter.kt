@@ -4,19 +4,19 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import fr.sedona.terraform.exception.StateAlreadyLockedException
 import fr.sedona.terraform.exception.StateLockMismatchException
 import fr.sedona.terraform.exception.StateNotLockedException
+import fr.sedona.terraform.http.exception.BadRequestException
 import fr.sedona.terraform.http.exception.ConflictException
 import fr.sedona.terraform.http.exception.LockedException
 import fr.sedona.terraform.http.exception.ResourceNotFoundException
-import fr.sedona.terraform.util.ensureIsLocked
-import fr.sedona.terraform.util.ensureIsNotLocked
-import fr.sedona.terraform.util.ensureLockOwnership
-import fr.sedona.terraform.util.toInternal
 import fr.sedona.terraform.http.model.TfLockInfo
 import fr.sedona.terraform.http.model.TfState
 import fr.sedona.terraform.storage.database.repository.TerraformStateRepository
 import fr.sedona.terraform.storage.model.State
+import fr.sedona.terraform.util.ensureIsLocked
+import fr.sedona.terraform.util.ensureIsNotLocked
+import fr.sedona.terraform.util.ensureLockOwnership
+import fr.sedona.terraform.util.toInternal
 import org.jboss.logging.Logger
-import javax.ws.rs.BadRequestException
 import kotlin.streams.toList
 
 class DatabaseAdapter(
@@ -91,9 +91,14 @@ class DatabaseAdapter(
 
             logger.debug("State for project $project is not locked -> deleting state")
             repository.delete(storedState)
+
         } catch (e: NoSuchElementException) {
             logger.warn("State for project $project does not exist -> returning resource not found error")
             throw ResourceNotFoundException(project)
+
+        } catch (e: StateAlreadyLockedException) {
+            logger.warn("State of project $project is already locked -> returning locked error")
+            throw LockedException(e.lockInfo)
         }
     }
 
