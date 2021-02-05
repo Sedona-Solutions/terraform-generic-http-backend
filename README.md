@@ -1,6 +1,6 @@
 # Generic HTTP backend for Terraform
 
-[![Maintainability](https://api.codeclimate.com/v1/badges/3a9e9daf7f2f9ce74eb2/maintainability)](https://codeclimate.com/github/Sedona-Solutions/terraform-generic-http-backend/maintainability) <a href="https://codeclimate.com/github/Sedona-Solutions/terraform-generic-http-backend/test_coverage"><img src="https://api.codeclimate.com/v1/badges/3a9e9daf7f2f9ce74eb2/test_coverage" /></a>
+![Github CI](https://github.com/Sedona-Solutions/terraform-generic-http-backend/workflows/github-actions-ci/badge.svg)  [![Maintainability](https://api.codeclimate.com/v1/badges/3a9e9daf7f2f9ce74eb2/maintainability)](https://codeclimate.com/github/Sedona-Solutions/terraform-generic-http-backend/maintainability)  [![Test Coverage](https://api.codeclimate.com/v1/badges/3a9e9daf7f2f9ce74eb2/test_coverage)](https://codeclimate.com/github/Sedona-Solutions/terraform-generic-http-backend/test_coverage)
 
 ## Description
 

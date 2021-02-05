@@ -1,4 +1,4 @@
-name: terraform-generic-http-backend
+name: github-actions-ci
 
 on:
   push:
