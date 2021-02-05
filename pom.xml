@@ -12,6 +12,7 @@
 
     <properties>
         <compiler-plugin.version>3.8.1</compiler-plugin.version>
+        <jacoco-maven-plugin.version>0.8.6</jacoco-maven-plugin.version>
         <kotlin.version>1.3.72</kotlin.version>
         <maven.compiler.parameters>true</maven.compiler.parameters>
         <maven.compiler.source>11</maven.compiler.source>
@@ -200,6 +201,40 @@
                         <option>all-open:annotation=javax.enterprise.context.ApplicationScoped</option>
                         <option>all-open:annotation=io.quarkus.test.junit.QuarkusTest</option>
                     </pluginOptions>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>post-unit-test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <dataFile>target/jacoco.exec</dataFile>
+                    <includes>
+                        <include>fr/sedona/terraform/**/*</include>
+                    </includes>
+                    <outputDirectory>target/jacoco-results</outputDirectory>
                 </configuration>
             </plugin>
         </plugins>
