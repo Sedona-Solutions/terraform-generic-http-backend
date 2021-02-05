@@ -8,6 +8,7 @@ import fr.sedona.terraform.exception.StateAlreadyLockedException
 import fr.sedona.terraform.exception.StateLockMismatchException
 import fr.sedona.terraform.exception.StateNotLockedException
 import fr.sedona.terraform.http.model.TfLockInfo
+import fr.sedona.terraform.http.model.TfState
 import fr.sedona.terraform.storage.model.State
 import io.mockk.junit5.MockKExtension
 import org.junit.jupiter.api.DisplayName
@@ -16,17 +17,26 @@ import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import java.util.*
-import kotlin.test.BeforeTest
-import kotlin.test.assertEquals
-import kotlin.test.fail
+import kotlin.test.*
 
 @ExtendWith(MockKExtension::class)
 class ExtensionsTest {
     private val testProjectName = "test-project"
     private val testLockId = "lock-id"
+    private val testVersion = 4
+    private val testTfVersion = "0.14.0"
+    private val testSerial = 1
+    private val testTfState = TfState(
+        version = testVersion,
+        tfVersion = testTfVersion,
+        serial = testSerial,
+        lineage = "",
+        outputs = null,
+        resources = null
+    )
     private val testTfLockInfo = TfLockInfo(
         id = testLockId,
-        version = "0.14.0",
+        version = testTfVersion,
         operation = "some-operation",
         created = Date(),
         info = "",
@@ -60,6 +70,84 @@ class ExtensionsTest {
         testLockedState.lockId = testLockId
         testLockedState.lockInfo = objectMapper.writeValueAsString(testTfLockInfo)
         testLockedState.locked = true
+    }
+
+    @Test
+    @DisplayName("Given nominal case (with lock), when converting TfState to internal, then returns the corresponding locked state")
+    fun testNominalCaseOnTfStateToInternal() {
+        // Given
+        val stringifiedLockInfo = objectMapper.writeValueAsString(testTfLockInfo)
+
+        // When / Then
+        val result = testTfState.toInternal(testProjectName, testLockId, stringifiedLockInfo, objectMapper)
+        assertNotNull(result)
+        assertEquals(testProjectName, result.name)
+        assertEquals(testLockId, result.lockId)
+        assertEquals(stringifiedLockInfo, result.lockInfo)
+        assertEquals(testVersion, result.version)
+        assertEquals(testTfVersion, result.tfVersion)
+        assertEquals(testSerial, result.serial)
+    }
+
+    @Test
+    @DisplayName("Given no lock, when converting TfState to internal, then returns the corresponding unlocked state")
+    fun testNoLockCaseOnTfStateToInternal() {
+        // Given - nothing
+
+        // When / Then
+        val result = testTfState.toInternal(testProjectName, null, null, objectMapper)
+        assertNotNull(result)
+        assertEquals(testProjectName, result.name)
+        assertNull(result.lockId)
+        assertNull(result.lockInfo)
+        assertEquals(testVersion, result.version)
+        assertEquals(testTfVersion, result.tfVersion)
+        assertEquals(testSerial, result.serial)
+    }
+
+    @Test
+    @DisplayName("Given nominal case (with lock), when converting TfState to internal (simple), then returns the corresponding locked state")
+    fun testNominalCaseOnTfStateToInternalSimple() {
+        // Given
+        val stringifiedLockInfo = objectMapper.writeValueAsString(testTfLockInfo)
+
+        // When / Then
+        val result = testTfState.toInternal(testProjectName, testTfLockInfo, objectMapper)
+        assertNotNull(result)
+        assertEquals(testProjectName, result.name)
+        assertEquals(testLockId, result.lockId)
+        assertEquals(stringifiedLockInfo, result.lockInfo)
+        assertEquals(testVersion, result.version)
+        assertEquals(testTfVersion, result.tfVersion)
+        assertEquals(testSerial, result.serial)
+    }
+
+    @Test
+    @DisplayName("Given no lock, when converting TfState to internal (simple), then returns the corresponding unlocked state")
+    fun testNoLockCaseOnTfStateToInternalSimple() {
+        // Given - nothing
+
+        // When / Then
+        val result = testTfState.toInternal(testProjectName, null, objectMapper)
+        assertNotNull(result)
+        assertEquals(testProjectName, result.name)
+        assertNull(result.lockId)
+        assertNull(result.lockInfo)
+        assertEquals(testVersion, result.version)
+        assertEquals(testTfVersion, result.tfVersion)
+        assertEquals(testSerial, result.serial)
+    }
+
+    @Test
+    @DisplayName("Given nominal case, when converting TfLockInfo to internal, then returns the lock info as string")
+    fun testNominalCaseOnTfLockInfoToInternal() {
+        // Given
+        val stringifiedLockInfo = objectMapper.writeValueAsString(testTfLockInfo)
+
+        // When / Then
+        val result = testTfLockInfo.toInternal(objectMapper)
+        assertNotNull(result)
+        assertEquals(stringifiedLockInfo, result)
     }
 
     @Test
