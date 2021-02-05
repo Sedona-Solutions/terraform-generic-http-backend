@@ -1,5 +1,7 @@
 # Generic HTTP backend for Terraform
 
+[![Maintainability](https://api.codeclimate.com/v1/badges/3a9e9daf7f2f9ce74eb2/maintainability)](https://codeclimate.com/github/Sedona-Solutions/terraform-generic-http-backend/maintainability) <a href="https://codeclimate.com/github/Sedona-Solutions/terraform-generic-http-backend/test_coverage"><img src="https://api.codeclimate.com/v1/badges/3a9e9daf7f2f9ce74eb2/test_coverage" /></a>
+
 ## Description
 
 This project contains a simple and generic HTTP backend for Terraform. The backend can be configured to use different storage adapter: either a database, or an ElasticSearch cluster. The backend supports state locking.
