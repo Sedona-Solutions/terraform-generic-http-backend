@@ -96,12 +96,14 @@ class ElasticsearchStateService (
         }
     }
 
-    fun delete(stateName: String): State {
+    fun delete(stateName: String) {
         val request = Request("DELETE", "/$indexName/_doc/$stateName")
         val response = restClient.performRequest(request)
         val responseBody = EntityUtils.toString(response.entity)
         val json = JsonObject(responseBody)
-        return json.getJsonObject("_source").mapTo<State>(State::class.java)
+        if(!json.getBoolean("acknowledged")) {
+            throw Exception("failed deletion")
+        }
     }
 
     fun lock(project: String, stateToUpdate: State, lockInfo: TfLockInfo): State {

@@ -4,19 +4,19 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import fr.sedona.terraform.exception.StateAlreadyLockedException
 import fr.sedona.terraform.exception.StateLockMismatchException
 import fr.sedona.terraform.exception.StateNotLockedException
+import fr.sedona.terraform.http.exception.BadRequestException
 import fr.sedona.terraform.http.exception.ConflictException
 import fr.sedona.terraform.http.exception.LockedException
 import fr.sedona.terraform.http.exception.ResourceNotFoundException
-import fr.sedona.terraform.http.extension.ensureIsLocked
-import fr.sedona.terraform.http.extension.ensureIsNotLocked
-import fr.sedona.terraform.http.extension.ensureLockOwnership
-import fr.sedona.terraform.http.extension.toInternal
 import fr.sedona.terraform.http.model.TfLockInfo
 import fr.sedona.terraform.http.model.TfState
 import fr.sedona.terraform.storage.elasticsearch.service.ElasticsearchStateService
 import fr.sedona.terraform.storage.model.State
+import fr.sedona.terraform.util.ensureIsLocked
+import fr.sedona.terraform.util.ensureIsNotLocked
+import fr.sedona.terraform.util.ensureLockOwnership
+import fr.sedona.terraform.util.toInternal
 import org.jboss.logging.Logger
-import javax.ws.rs.BadRequestException
 
 class ElasticAdapter(
         private val stateService: ElasticsearchStateService,
@@ -90,6 +90,9 @@ class ElasticAdapter(
         } catch (e: NoSuchElementException) {
             logger.warn("State for project $project does not exist -> returning resource not found error")
             throw ResourceNotFoundException(project)
+        } catch (e: StateAlreadyLockedException) {
+            logger.warn("State of project $project is already locked -> returning locked error")
+            throw LockedException(e.lockInfo)
         }
     }
 
