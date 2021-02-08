@@ -5,6 +5,7 @@ import fr.sedona.terraform.storage.adapter.DatabaseAdapter
 import fr.sedona.terraform.storage.adapter.ElasticAdapter
 import fr.sedona.terraform.storage.adapter.StorageAdapter
 import fr.sedona.terraform.storage.database.repository.TerraformStateRepository
+import fr.sedona.terraform.storage.elasticsearch.service.ElasticsearchStateService
 import io.quarkus.arc.DefaultBean
 import io.quarkus.arc.properties.IfBuildProperty
 import org.jboss.logging.Logger
@@ -27,8 +28,12 @@ class StorageConfig {
 
     @Produces
     @IfBuildProperty(name = "application.storage.adapter", stringValue = "elastic")
-    fun elasticStorageAdapter(): StorageAdapter {
+    fun elasticStorageAdapter(
+            stateService: ElasticsearchStateService,
+            objectMapper: ObjectMapper
+    ): StorageAdapter {
         logger.info("Using elastic storage adapter")
-        return ElasticAdapter()
+        stateService.initializeIndexIfNeeded()
+        return ElasticAdapter(stateService, objectMapper)
     }
 }
