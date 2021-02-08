@@ -2,9 +2,9 @@ name: github-actions-ci
 
 on:
   push:
-    branches: [ develop ]
+    branches: [ develop, feat-*, feature-* ]
   pull_request:
-    branches: [ develop ]
+    branches: [ develop feat-*, feature-* ]
   workflow_dispatch:
 
 jobs:
