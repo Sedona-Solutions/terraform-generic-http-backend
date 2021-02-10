@@ -476,4 +476,104 @@ class TerraformStateResourceTest {
             verify(exactly = 1) { storageAdapter.forceUnlock(any()) }
         }
     }
+
+    @Test
+    @DisplayName("Given nominal case, when unlocking state (alt), then returns an empty response with status OK")
+    fun testNominalCaseOnUnlockStateAlt() {
+        // Given - nothing
+
+        // When
+        val result = terraformStateResource.unlockState(testProjectName, testTfLockInfo)
+
+        // Then
+        verify(exactly = 1) { storageAdapter.unlock(any(), any()) }
+        verify(exactly = 0) { storageAdapter.forceUnlock(any()) }
+        assertNotNull(result)
+        assertEquals(200, result.status)
+    }
+
+    @Test
+    @DisplayName("Given no specified element, when unlocking state (alt), then throws bad request exception")
+    fun testNoElementCaseOnUnlockStateAlt() {
+        // Given
+        every { storageAdapter.unlock(any(), any()) } throws BadRequestException()
+
+        // When / Then
+        try {
+            terraformStateResource.unlockState(testProjectName, testTfLockInfo)
+
+            fail("Should not just run")
+        } catch (e: BadRequestException) {
+            verify(exactly = 1) { storageAdapter.unlock(any(), any()) }
+            verify(exactly = 0) { storageAdapter.forceUnlock(any()) }
+        }
+    }
+
+    @Test
+    @DisplayName("Given state is not locked, when unlocking state (alt), then throws conflict exception")
+    fun testNotLockedCaseOnUnlockStateAlt() {
+        // Given
+        every { storageAdapter.unlock(any(), any()) } throws ConflictException(testTfLockInfo)
+
+        // When / Then
+        try {
+            terraformStateResource.unlockState(testProjectName, testTfLockInfo)
+
+            fail("Should not just run")
+        } catch (e: ConflictException) {
+            verify(exactly = 1) { storageAdapter.unlock(any(), any()) }
+            verify(exactly = 0) { storageAdapter.forceUnlock(any()) }
+            assertEquals(testTfLockInfo, e.lockInfo)
+        }
+    }
+
+    @Test
+    @DisplayName("Given state is locked by someone else, when unlocking state (alt), then throws locked exception")
+    fun testLockMismatchCaseOnUnlockStateAlt() {
+        // Given
+        every { storageAdapter.unlock(any(), any()) } throws LockedException(testTfLockInfo)
+
+        // When / Then
+        try {
+            terraformStateResource.unlockState(testProjectName, testTfLockInfo)
+
+            fail("Should not just run")
+        } catch (e: LockedException) {
+            verify(exactly = 1) { storageAdapter.unlock(any(), any()) }
+            verify(exactly = 0) { storageAdapter.forceUnlock(any()) }
+            assertEquals(testTfLockInfo, e.lockInfo)
+        }
+    }
+
+    @Test
+    @DisplayName("Given force unlock, when unlocking state (alt), then returns an empty response with status OK")
+    fun testForceUnlockCaseOnUnlockStateAlt() {
+        // Given - nothing
+
+        // When
+        val result = terraformStateResource.unlockState(testProjectName, null)
+
+        // Then
+        verify(exactly = 0) { storageAdapter.unlock(any(), any()) }
+        verify(exactly = 1) { storageAdapter.forceUnlock(any()) }
+        assertNotNull(result)
+        assertEquals(200, result.status)
+    }
+
+    @Test
+    @DisplayName("Given force unlock on no specified element, when unlocking state (alt), then throws bad request exception")
+    fun testNoElementForceUnlockCaseOnUnlockStateAlt() {
+        // Given
+        every { storageAdapter.forceUnlock(any()) } throws BadRequestException()
+
+        // When / Then
+        try {
+            terraformStateResource.unlockState(testProjectName, null)
+
+            fail("Should not just run")
+        } catch (e: BadRequestException) {
+            verify(exactly = 0) { storageAdapter.unlock(any(), any()) }
+            verify(exactly = 1) { storageAdapter.forceUnlock(any()) }
+        }
+    }
 }
