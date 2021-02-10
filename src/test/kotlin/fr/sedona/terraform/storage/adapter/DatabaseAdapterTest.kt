@@ -59,6 +59,9 @@ class DatabaseAdapterTest {
         who = "test@test.com",
         path = "test-project"
     )
+    private val defaultPageIndex = 1
+    private val defaultPageSize = 25
+
     private lateinit var testUnlockedState: State
     private lateinit var testLockedState: State
 
@@ -96,6 +99,7 @@ class DatabaseAdapterTest {
         every { testLockedState.ensureLockOwnership(any(), any()) } just Runs
 
         every { terraformStateRepository.streamAll() } returns Stream.of(testUnlockedState)
+        every { terraformStateRepository.paginate(any(), any()) } returns Stream.of(testUnlockedState)
         every { terraformStateRepository.findByIdOptional(any()) } returns Optional.of(testUnlockedState)
         every { terraformStateRepository.add(any()) } just Runs
         every { terraformStateRepository.update(any() as State) } just Runs
@@ -135,6 +139,57 @@ class DatabaseAdapterTest {
         verify(exactly = 1) { terraformStateRepository.streamAll() }
         assertNotNull(result)
         assertEquals(0, result.size)
+    }
+
+    @Test
+    @DisplayName("Given nominal case, when paginating states, then returns a list of states")
+    fun testNominalCaseOnPaginate() {
+        // Given - nothing
+
+        // When
+        val result = databaseAdapter.paginate(defaultPageIndex, defaultPageSize)
+
+        // Then
+        verify(exactly = 1) { terraformStateRepository.paginate(any(), any()) }
+        assertNotNull(result)
+        assertEquals(1, result.size)
+        assertEquals(testUnlockedState, result.firstOrNull())
+    }
+
+    @Test
+    @DisplayName("Given no elements in database, when paginating states, then returns an empty list of states")
+    fun testNoElementsCaseOnPaginate() {
+        // Given
+        every { terraformStateRepository.paginate(any(), any()) } returns Stream.empty()
+
+        // When
+        val result = databaseAdapter.paginate(defaultPageIndex, defaultPageSize)
+
+        // Then
+        verify(exactly = 1) { terraformStateRepository.paginate(any(), any()) }
+        assertNotNull(result)
+        assertEquals(0, result.size)
+    }
+
+    @Test
+    @DisplayName("Given no params, when paginating states, then returns the 1st page of 25 states")
+    fun testNoParamsCaseOnPaginate() {
+        // Given
+        val capturedPageIndex = slot<Int>()
+        val capturedPageSize = slot<Int>()
+        every { terraformStateRepository.paginate(capture(capturedPageIndex), capture(capturedPageSize)) } returns
+                Stream.of(testUnlockedState)
+
+        // When
+        val result = databaseAdapter.paginate()
+
+        // Then
+        verify(exactly = 1) { terraformStateRepository.paginate(any(), any()) }
+        assertNotNull(result)
+        assertEquals(1, result.size)
+        assertEquals(testUnlockedState, result.firstOrNull())
+        assertEquals(defaultPageIndex, capturedPageIndex.captured)
+        assertEquals(defaultPageSize, capturedPageSize.captured)
     }
 
     @Test
@@ -408,7 +463,7 @@ class DatabaseAdapterTest {
     }
 
     @Test
-    @DisplayName("Given no element with specified id, when unlocking, then throws conflict exception")
+    @DisplayName("Given no element with specified id, when unlocking, then throws bad request exception")
     fun testNotFoundCaseOnUnlock() {
         // Given
         every { terraformStateRepository.findByIdOptional(any()) } throws NoSuchElementException()
@@ -418,14 +473,13 @@ class DatabaseAdapterTest {
             databaseAdapter.unlock(testProjectName, testTfLockInfo)
 
             fail("Should not just run")
-        } catch (e: ConflictException) {
+        } catch (e: BadRequestException) {
             verify(exactly = 1) { terraformStateRepository.findByIdOptional(any()) }
             verify(exactly = 0) { testLockedState.ensureIsLocked() }
             verify(exactly = 0) { testLockedState.ensureLockOwnership(any(), any()) }
             verify(exactly = 0) { testUnlockedState.ensureIsLocked() }
             verify(exactly = 0) { testUnlockedState.ensureLockOwnership(any(), any()) }
             verify(exactly = 0) { terraformStateRepository.unlock(any(), any()) }
-            assertEquals(testTfLockInfo, e.lockInfo)
         }
     }
 

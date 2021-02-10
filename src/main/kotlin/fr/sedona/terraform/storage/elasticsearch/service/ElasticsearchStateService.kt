@@ -64,6 +64,28 @@ class ElasticsearchStateService (
         return results
     }
 
+    fun paginate(pageIndex: Int, pageSize: Int): List<State> {
+        logger.debug("Paginating states")
+
+        val from = pageSize * pageIndex - pageSize
+        val request = Request("GET", "/$indexName/_search?scroll=1m")
+        request.setJsonEntity("{\"from\":$from, \"size\":$pageSize}")
+        val response = restClient.performRequest(request)
+        val responseBody = JsonObject(EntityUtils.toString(response.entity))
+        val hitsObject = responseBody.getJsonObject("hits")
+        val results = extractResultPage(hitsObject)
+
+        val total = countAllStates()
+
+        if(total > pageSize){
+            val scrollId = responseBody.getString("_scroll_id")
+            loopOnScroll(scrollId, total, results)
+        }
+
+        logger.debug("Paginated states : total of ${results.size} results found")
+        return results
+    }
+
     fun update(stateToUpdate: State) {
         logger.debug("Updating state for project ${stateToUpdate.name}")
 
@@ -76,9 +98,9 @@ class ElasticsearchStateService (
         val updateResult = JsonObject(responseBody).getString("result");
 
         if(updateResult in SUCCESS_UPDATE_RESULTS) {
-            logger.info("State for project ${stateToUpdate.name} updated successfully : result => ${updateResult}")
+            logger.info("State for project ${stateToUpdate.name} updated successfully : result => $updateResult")
         } else {
-            logger.info("State for project ${stateToUpdate.name} cannot be created nor updated : result => ${updateResult}")
+            logger.info("State for project ${stateToUpdate.name} cannot be created nor updated : result => $updateResult")
         }
     }
 

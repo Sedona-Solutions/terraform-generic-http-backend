@@ -3,10 +3,10 @@ package fr.sedona.terraform.http
 import com.fasterxml.jackson.databind.ObjectMapper
 import fr.sedona.terraform.http.annotation.LOCK
 import fr.sedona.terraform.http.annotation.UNLOCK
-import fr.sedona.terraform.util.toTerraform
 import fr.sedona.terraform.http.model.TfLockInfo
 import fr.sedona.terraform.http.model.TfState
 import fr.sedona.terraform.storage.adapter.StorageAdapter
+import fr.sedona.terraform.util.toTerraform
 import org.jboss.logging.Logger
 import javax.ws.rs.*
 import javax.ws.rs.core.MediaType
@@ -21,12 +21,22 @@ class TerraformStateResource(
     private val objectMapper: ObjectMapper
 ) {
     private val logger = Logger.getLogger(TerraformStateResource::class.java)
+    private val defaultPageIndex = 1
+    private val defaultPageSize = 25
 
     @GET
-    fun listAllStates(): List<TfState> {
-        logger.debug("Received GET for all TF states")
-        return storageAdapter.listAll()
-            .map { it.toTerraform(objectMapper) }
+    fun listStates(
+        @QueryParam("index") index: Int?,
+        @QueryParam("size") pageSize: Int?
+    ): List<TfState> {
+        logger.debug("Received GET for TF states with index=${index} and pageSize=${pageSize}")
+        return if (index != null || pageSize != null) {
+            storageAdapter.paginate(index ?: defaultPageIndex, pageSize ?: defaultPageSize)
+                .map { it.toTerraform(objectMapper) }
+        } else {
+            storageAdapter.listAll()
+                .map { it.toTerraform(objectMapper) }
+        }
     }
 
     @GET

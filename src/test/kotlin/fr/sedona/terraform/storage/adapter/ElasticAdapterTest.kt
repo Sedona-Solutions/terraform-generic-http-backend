@@ -10,7 +10,6 @@ import fr.sedona.terraform.http.exception.LockedException
 import fr.sedona.terraform.http.exception.ResourceNotFoundException
 import fr.sedona.terraform.http.model.TfLockInfo
 import fr.sedona.terraform.http.model.TfState
-import fr.sedona.terraform.storage.database.repository.TerraformStateRepository
 import fr.sedona.terraform.storage.elasticsearch.service.ElasticsearchStateService
 import fr.sedona.terraform.storage.model.State
 import fr.sedona.terraform.util.ensureIsLocked
@@ -24,7 +23,6 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import java.util.*
-import java.util.stream.Stream
 import kotlin.NoSuchElementException
 import kotlin.test.BeforeTest
 import kotlin.test.assertEquals
@@ -60,6 +58,9 @@ class ElasticAdapterTest {
         who = "test@test.com",
         path = "test-project"
     )
+    private val defaultPageIndex = 1
+    private val defaultPageSize = 25
+
     private lateinit var testUnlockedState: State
     private lateinit var testLockedState: State
 
@@ -97,6 +98,7 @@ class ElasticAdapterTest {
         every { testLockedState.ensureLockOwnership(any(), any()) } just Runs
 
         every { elasticStateService.listAll() } returns listOf(testUnlockedState)
+        every { elasticStateService.paginate(any(), any()) } returns listOf(testUnlockedState)
         every { elasticStateService.get(any()) } returns testUnlockedState
         every { elasticStateService.update(any() as State) } just Runs
         every { elasticStateService.delete(any()) } just Runs
@@ -123,7 +125,7 @@ class ElasticAdapterTest {
     }
 
     @Test
-    @DisplayName("Given no elements in database, when listing all states, then returns an empty list of states")
+    @DisplayName("Given no elements in ES, when listing all states, then returns an empty list of states")
     fun testNoElementsCaseOnListAll() {
         // Given
         every { elasticStateService.listAll() } returns emptyList()
@@ -135,6 +137,57 @@ class ElasticAdapterTest {
         verify(exactly = 1) { elasticStateService.listAll() }
         assertNotNull(result)
         assertEquals(0, result.size)
+    }
+
+    @Test
+    @DisplayName("Given nominal case, when paginating states, then returns a page of states")
+    fun testNominalCaseOnPaginate() {
+        // Given - nothing
+
+        // When
+        val result = elasticAdapter.paginate(defaultPageIndex, defaultPageSize)
+
+        // Then
+        verify(exactly = 1) { elasticStateService.paginate(any(), any()) }
+        assertNotNull(result)
+        assertEquals(1, result.size)
+        assertEquals(testUnlockedState, result.firstOrNull())
+    }
+
+    @Test
+    @DisplayName("Given no elements in ES, when paginating states, then returns an empty list of states")
+    fun testNoElementsCaseOnPaginate() {
+        // Given
+        every { elasticStateService.paginate(any(), any()) } returns emptyList()
+
+        // When
+        val result = elasticAdapter.paginate(defaultPageIndex, defaultPageSize)
+
+        // Then
+        verify(exactly = 1) { elasticStateService.paginate(any(), any()) }
+        assertNotNull(result)
+        assertEquals(0, result.size)
+    }
+
+    @Test
+    @DisplayName("Given no params, when paginating states, then returns the 1st page of 25 states")
+    fun testNoParamsCaseOnPaginate() {
+        // Given
+        val capturedPageIndex = slot<Int>()
+        val capturedPageSize = slot<Int>()
+        every { elasticAdapter.paginate(capture(capturedPageIndex), capture(capturedPageSize)) } returns
+                listOf(testUnlockedState)
+
+        // When
+        val result = elasticAdapter.paginate()
+
+        // Then
+        verify(exactly = 1) { elasticStateService.paginate(any(), any()) }
+        assertNotNull(result)
+        assertEquals(1, result.size)
+        assertEquals(testUnlockedState, result.firstOrNull())
+        assertEquals(defaultPageIndex, capturedPageIndex.captured)
+        assertEquals(defaultPageSize, capturedPageSize.captured)
     }
 
     @Test

@@ -7,6 +7,8 @@ import fr.sedona.terraform.storage.model.State
 interface StorageAdapter {
     fun listAll(): List<State>
 
+    fun paginate(index: Int = 1, pageSize: Int = 25): List<State>
+
     fun findById(project: String): State
 
     fun updateWithLock(project: String, lockId: String, state: TfState)

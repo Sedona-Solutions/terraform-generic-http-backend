@@ -19,13 +19,17 @@ import fr.sedona.terraform.util.toInternal
 import org.jboss.logging.Logger
 
 class ElasticAdapter(
-        private val stateService: ElasticsearchStateService,
-        private val objectMapper: ObjectMapper
+    private val stateService: ElasticsearchStateService,
+    private val objectMapper: ObjectMapper
 ) : StorageAdapter {
     private val logger = Logger.getLogger(ElasticAdapter::class.java)
 
     override fun listAll(): List<State> {
         return stateService.listAll()
+    }
+
+    override fun paginate(index: Int, pageSize: Int): List<State> {
+        return stateService.paginate(index, pageSize)
     }
 
     override fun findById(project: String): State {

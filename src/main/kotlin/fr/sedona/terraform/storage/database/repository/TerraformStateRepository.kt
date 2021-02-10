@@ -7,6 +7,7 @@ import fr.sedona.terraform.storage.model.State
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase
 import org.jboss.logging.Logger
 import java.util.*
+import java.util.stream.Stream
 import javax.enterprise.context.ApplicationScoped
 import javax.transaction.Transactional
 
@@ -16,6 +17,12 @@ class TerraformStateRepository(
     private val objectMapper: ObjectMapper
 ) : PanacheRepositoryBase<State, String> {
     private val logger = Logger.getLogger(TerraformStateRepository::class.java)
+
+    fun paginate(pageIndex: Int, pageSize: Int): Stream<State> {
+        return findAll()
+            .page<State>(pageIndex, pageSize)
+            .stream<State>()
+    }
 
     @Transactional
     fun add(stateToSave: State) {

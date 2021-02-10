@@ -30,6 +30,11 @@ class DatabaseAdapter(
             .toList()
     }
 
+    override fun paginate(index: Int, pageSize: Int): List<State> {
+        return repository.paginate(index, pageSize)
+            .toList()
+    }
+
     override fun findById(project: String): State {
         try {
             return repository.findByIdOptional(project).get()
@@ -138,8 +143,8 @@ class DatabaseAdapter(
             repository.unlock(project, storedState)
 
         } catch (e: NoSuchElementException) {
-            logger.warn("State of project $project is already unlocked -> returning conflict error")
-            throw ConflictException(lockInfo)
+            logger.warn("State of project $project does not exist -> returning bad request error")
+            throw BadRequestException()
 
         } catch (e: StateNotLockedException) {
             logger.warn("State of project $project exists but is not locked -> returning conflict error")
