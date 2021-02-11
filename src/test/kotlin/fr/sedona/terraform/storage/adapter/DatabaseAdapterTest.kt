@@ -112,7 +112,11 @@ class DatabaseAdapterTest {
     }
 
     @Test
-    @DisplayName("Given nominal case, when listing all states, then returns a list of states")
+    @DisplayName(
+        "Given nominal case, " +
+                "when listing all states, " +
+                "then returns a list of states"
+    )
     fun testNominalCaseOnListAll() {
         // Given - nothing
 
@@ -127,7 +131,11 @@ class DatabaseAdapterTest {
     }
 
     @Test
-    @DisplayName("Given no elements in database, when listing all states, then returns an empty list of states")
+    @DisplayName(
+        "Given no elements in database, " +
+                "when listing all states, " +
+                "then returns an empty list of states"
+    )
     fun testNoElementsCaseOnListAll() {
         // Given
         every { terraformStateRepository.streamAll() } returns Stream.empty()
@@ -142,7 +150,11 @@ class DatabaseAdapterTest {
     }
 
     @Test
-    @DisplayName("Given nominal case, when paginating states, then returns a list of states")
+    @DisplayName(
+        "Given nominal case, " +
+                "when paginating states, " +
+                "then returns a list of states"
+    )
     fun testNominalCaseOnPaginate() {
         // Given - nothing
 
@@ -157,7 +169,11 @@ class DatabaseAdapterTest {
     }
 
     @Test
-    @DisplayName("Given no elements in database, when paginating states, then returns an empty list of states")
+    @DisplayName(
+        "Given no elements in database, " +
+                "when paginating states, " +
+                "then returns an empty list of states"
+    )
     fun testNoElementsCaseOnPaginate() {
         // Given
         every { terraformStateRepository.paginate(any(), any()) } returns Stream.empty()
@@ -172,7 +188,11 @@ class DatabaseAdapterTest {
     }
 
     @Test
-    @DisplayName("Given no params, when paginating states, then returns the 1st page of 25 states")
+    @DisplayName(
+        "Given no params, " +
+                "when paginating states, " +
+                "then returns the 1st page of 25 states"
+    )
     fun testNoParamsCaseOnPaginate() {
         // Given
         val capturedPageIndex = slot<Int>()
@@ -193,7 +213,11 @@ class DatabaseAdapterTest {
     }
 
     @Test
-    @DisplayName("Given nominal case, when finding by id, then returns a state")
+    @DisplayName(
+        "Given nominal case, " +
+                "when finding by id, " +
+                "then returns a state"
+    )
     fun testNominalCaseOnFindById() {
         // Given - nothing
 
@@ -207,7 +231,11 @@ class DatabaseAdapterTest {
     }
 
     @Test
-    @DisplayName("Given no element with specified id, when finding by id, then throws a resource not found exception")
+    @DisplayName(
+        "Given no element with specified id, " +
+                "when finding by id, " +
+                "then throws a resource not found exception"
+    )
     fun testNotFoundCaseOnFindById() {
         // Given
         every { terraformStateRepository.findByIdOptional(any()) } throws NoSuchElementException()
@@ -223,7 +251,11 @@ class DatabaseAdapterTest {
     }
 
     @Test
-    @DisplayName("Given nominal case, when updating with lock, then updates state")
+    @DisplayName(
+        "Given nominal case, " +
+                "when updating with lock, " +
+                "then updates state"
+    )
     fun testNominalCaseOnUpdateWithLock() {
         // Given
         every { terraformStateRepository.findByIdOptional(any()) } returns Optional.of(testLockedState)
@@ -242,7 +274,11 @@ class DatabaseAdapterTest {
     }
 
     @Test
-    @DisplayName("Given no element with specified id, when updating with lock, then adds state")
+    @DisplayName(
+        "Given no element with specified id, " +
+                "when updating with lock, " +
+                "then adds state"
+    )
     fun testNotFoundCaseOnUpdateWithLock() {
         // Given
         every { terraformStateRepository.findByIdOptional(any()) } throws NoSuchElementException()
@@ -261,7 +297,11 @@ class DatabaseAdapterTest {
     }
 
     @Test
-    @DisplayName("Given state is not locked, when updating with lock, then throws bad request exception")
+    @DisplayName(
+        "Given state is not locked, " +
+                "when updating with lock, " +
+                "then throws bad request exception"
+    )
     fun testNotLockedCaseOnUpdateWithLock() {
         // Given
         every { terraformStateRepository.findByIdOptional(any()) } returns Optional.of(testUnlockedState)
@@ -283,7 +323,11 @@ class DatabaseAdapterTest {
     }
 
     @Test
-    @DisplayName("Given state is locked by someone else, when updating with lock, then throws locked exception")
+    @DisplayName(
+        "Given state is locked by someone else, " +
+                "when updating with lock, " +
+                "then throws locked exception"
+    )
     fun testLockMismatchedCaseOnUpdateWithLock() {
         // Given
         every { terraformStateRepository.findByIdOptional(any()) } returns Optional.of(testLockedState)
@@ -307,7 +351,11 @@ class DatabaseAdapterTest {
     }
 
     @Test
-    @DisplayName("Given nominal case, when updating without lock, then updates state")
+    @DisplayName(
+        "Given nominal case, " +
+                "when updating without lock, " +
+                "then updates state"
+    )
     fun testNominalCaseOnUpdateWithoutLock() {
         // Given - nothing
 
@@ -321,7 +369,11 @@ class DatabaseAdapterTest {
     }
 
     @Test
-    @DisplayName("Given no element with specified id, when updating without lock, then adds state")
+    @DisplayName(
+        "Given no element with specified id, " +
+                "when updating without lock, " +
+                "then adds state"
+    )
     fun testNotFoundCaseOnUpdateWithoutLock() {
         // Given
         every { terraformStateRepository.findByIdOptional(any()) } throws NoSuchElementException()
@@ -336,7 +388,11 @@ class DatabaseAdapterTest {
     }
 
     @Test
-    @DisplayName("Given nominal case, when deleting, then deletes state")
+    @DisplayName(
+        "Given nominal case, " +
+                "when deleting, " +
+                "then deletes state"
+    )
     fun testNominalCaseOnDelete() {
         // Given - nothing
 
@@ -351,7 +407,11 @@ class DatabaseAdapterTest {
     }
 
     @Test
-    @DisplayName("Given no element with specified id, when deleting, then throws resource not found exception")
+    @DisplayName(
+        "Given no element with specified id, " +
+                "when deleting, " +
+                "then throws resource not found exception"
+    )
     fun testNotFoundCaseOnDelete() {
         // Given
         every { terraformStateRepository.findByIdOptional(any()) } throws NoSuchElementException()
@@ -371,7 +431,11 @@ class DatabaseAdapterTest {
     }
 
     @Test
-    @DisplayName("Given state is locked, when deleting, then throws locked exception")
+    @DisplayName(
+        "Given state is locked, " +
+                "when deleting, " +
+                "then throws locked exception"
+    )
     fun testLockedCaseOnDelete() {
         // Given
         every { terraformStateRepository.findByIdOptional(any()) } returns Optional.of(testLockedState)
@@ -391,7 +455,11 @@ class DatabaseAdapterTest {
     }
 
     @Test
-    @DisplayName("Given nominal case, when locking, then locks state")
+    @DisplayName(
+        "Given nominal case, " +
+                "when locking, " +
+                "then locks state"
+    )
     fun testNominalCaseOnLock() {
         // Given - nothing
 
@@ -407,7 +475,11 @@ class DatabaseAdapterTest {
     }
 
     @Test
-    @DisplayName("Given no element with specified id, when locking, then creates and locks state")
+    @DisplayName(
+        "Given no element with specified id, " +
+                "when locking, " +
+                "then creates and locks state"
+    )
     fun testNotFoundCaseOnLock() {
         // Given
         every { terraformStateRepository.findByIdOptional(any()) } throws NoSuchElementException()
@@ -424,7 +496,11 @@ class DatabaseAdapterTest {
     }
 
     @Test
-    @DisplayName("Given state is locked by someone else, when locking, then throws locked exception")
+    @DisplayName(
+        "Given state is locked by someone else, " +
+                "when locking, " +
+                "then throws locked exception"
+    )
     fun testLockedCaseOnLock() {
         // Given
         every { terraformStateRepository.findByIdOptional(any()) } returns Optional.of(testLockedState)
@@ -445,7 +521,11 @@ class DatabaseAdapterTest {
     }
 
     @Test
-    @DisplayName("Given nominal case, when unlocking, then unlocks state")
+    @DisplayName(
+        "Given nominal case, " +
+                "when unlocking, " +
+                "then unlocks state"
+    )
     fun testNominalCaseOnUnlock() {
         // Given
         every { terraformStateRepository.findByIdOptional(any()) } returns Optional.of(testLockedState)
@@ -463,7 +543,11 @@ class DatabaseAdapterTest {
     }
 
     @Test
-    @DisplayName("Given no element with specified id, when unlocking, then throws bad request exception")
+    @DisplayName(
+        "Given no element with specified id, " +
+                "when unlocking, " +
+                "then throws bad request exception"
+    )
     fun testNotFoundCaseOnUnlock() {
         // Given
         every { terraformStateRepository.findByIdOptional(any()) } throws NoSuchElementException()
@@ -484,7 +568,11 @@ class DatabaseAdapterTest {
     }
 
     @Test
-    @DisplayName("Given state is not locked, when unlocking, then throws conflict exception")
+    @DisplayName(
+        "Given state is not locked, " +
+                "when unlocking, " +
+                "then throws conflict exception"
+    )
     fun testNotLockedCaseOnUnlock() {
         // Given - nothing
 
@@ -505,7 +593,11 @@ class DatabaseAdapterTest {
     }
 
     @Test
-    @DisplayName("Given state is locked by someone else, when unlocking, then throws locked exception")
+    @DisplayName(
+        "Given state is locked by someone else, " +
+                "when unlocking, " +
+                "then throws locked exception"
+    )
     fun testLockMismatchedCaseOnUnlock() {
         // Given
         every { terraformStateRepository.findByIdOptional(any()) } returns Optional.of(testLockedState)
@@ -528,7 +620,11 @@ class DatabaseAdapterTest {
     }
 
     @Test
-    @DisplayName("Given nominal case, when forcing unlock, then forces unlock state")
+    @DisplayName(
+        "Given nominal case, " +
+                "when forcing unlock, " +
+                "then forces unlock state"
+    )
     fun testNominalCaseOnForceUnlock() {
         // Given - nothing
 
@@ -541,7 +637,11 @@ class DatabaseAdapterTest {
     }
 
     @Test
-    @DisplayName("Given no element with specified id, when forcing unlock, then throws bad request exception")
+    @DisplayName(
+        "Given no element with specified id, " +
+                "when forcing unlock, " +
+                "then throws bad request exception"
+    )
     fun testNotFoundCaseOnForceUnlock() {
         // Given
         every { terraformStateRepository.findByIdOptional(any()) } throws NoSuchElementException()

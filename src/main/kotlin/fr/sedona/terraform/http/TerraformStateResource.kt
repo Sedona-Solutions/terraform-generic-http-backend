@@ -12,6 +12,8 @@ import javax.ws.rs.*
 import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.Response
 
+const val DEFAULT_PAGE_INDEX = 1
+const val DEFAULT_PAGE_SIZE = 25
 
 @Path("/tf-state")
 @Produces(MediaType.APPLICATION_JSON)
@@ -21,8 +23,6 @@ class TerraformStateResource(
     private val objectMapper: ObjectMapper
 ) {
     private val logger = Logger.getLogger(TerraformStateResource::class.java)
-    private val defaultPageIndex = 1
-    private val defaultPageSize = 25
 
     @GET
     fun listStates(
@@ -31,7 +31,7 @@ class TerraformStateResource(
     ): List<TfState> {
         logger.debug("Received GET for TF states with index=${index} and pageSize=${pageSize}")
         return if (index != null || pageSize != null) {
-            storageAdapter.paginate(index ?: defaultPageIndex, pageSize ?: defaultPageSize)
+            storageAdapter.paginate(index ?: DEFAULT_PAGE_INDEX, pageSize ?: DEFAULT_PAGE_SIZE)
                 .map { it.toTerraform(objectMapper) }
         } else {
             storageAdapter.listAll()

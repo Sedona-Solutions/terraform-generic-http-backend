@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import java.util.*
+import javax.ws.rs.core.Response
 import kotlin.test.BeforeTest
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -31,7 +32,9 @@ class HttpExceptionMapperTest {
     }
 
     @Test
-    @DisplayName("Given bad request exception, when converting to response, then returns a response with HTTP status 400")
+    @DisplayName("Given bad request exception, " +
+            "when converting to response, " +
+            "then returns a response with HTTP status 400")
     fun testBadRequestExceptionCaseOnToResponse() {
         // Given
         val testException = BadRequestException()
@@ -41,11 +44,13 @@ class HttpExceptionMapperTest {
 
         // Then
         assertNotNull(result)
-        assertEquals(400, result.status)
+        assertEquals(Response.Status.BAD_REQUEST.statusCode, result.status)
     }
 
     @Test
-    @DisplayName("Given resource not found exception, when converting to response, then returns a response with HTTP status 404")
+    @DisplayName("Given resource not found exception, " +
+            "when converting to response, " +
+            "then returns a response with HTTP status 404")
     fun testResourceNotFoundExceptionCaseOnToResponse() {
         // Given
         val testException = ResourceNotFoundException(testProjectName)
@@ -55,11 +60,13 @@ class HttpExceptionMapperTest {
 
         // Then
         assertNotNull(result)
-        assertEquals(404, result.status)
+        assertEquals(Response.Status.NOT_FOUND.statusCode, result.status)
     }
 
     @Test
-    @DisplayName("Given conflict exception, when converting to response, then returns a response with HTTP status 409")
+    @DisplayName("Given conflict exception, " +
+            "when converting to response, " +
+            "then returns a response with HTTP status 409")
     fun testConflictExceptionCaseOnToResponse() {
         // Given
         val testException = ConflictException(testTfLockInfo)
@@ -69,11 +76,13 @@ class HttpExceptionMapperTest {
 
         // Then
         assertNotNull(result)
-        assertEquals(409, result.status)
+        assertEquals(Response.Status.CONFLICT.statusCode, result.status)
     }
 
     @Test
-    @DisplayName("Given locked exception, when converting to response, then returns a response with HTTP status 423")
+    @DisplayName("Given locked exception, " +
+            "when converting to response, " +
+            "then returns a response with HTTP status 423")
     fun testLockedExceptionCaseOnToResponse() {
         // Given
         val testException = LockedException(testTfLockInfo)
@@ -83,11 +92,13 @@ class HttpExceptionMapperTest {
 
         // Then
         assertNotNull(result)
-        assertEquals(423, result.status)
+        assertEquals(LOCKED_STATUS_CODE, result.status)
     }
 
     @Test
-    @DisplayName("Given unexpected exception, when converting to response, then returns a response with HTTP status 500")
+    @DisplayName("Given unexpected exception, " +
+            "when converting to response, " +
+            "then returns a response with HTTP status 500")
     fun testUnexpectedExceptionCaseOnToResponse() {
         // Given
         val testException = RuntimeException()
@@ -97,6 +108,6 @@ class HttpExceptionMapperTest {
 
         // Then
         assertNotNull(result)
-        assertEquals(500, result.status)
+        assertEquals(Response.Status.INTERNAL_SERVER_ERROR.statusCode, result.status)
     }
 }

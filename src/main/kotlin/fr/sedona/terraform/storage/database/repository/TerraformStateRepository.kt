@@ -35,7 +35,8 @@ class TerraformStateRepository(
     fun update(stateToUpdate: State) {
         logger.debug("Updating state for project ${stateToUpdate.name}")
         update(
-            "lastModified = ?2, locked = ?3, lockId = ?4, lockInfo = ?5, version = ?6, tfVersion = ?7, serial = ?8, state = ?9 WHERE name = ?1",
+            "lastModified = ?2, locked = ?3, lockId = ?4, lockInfo = ?5, version = ?6, " +
+                    "tfVersion = ?7, serial = ?8, state = ?9 WHERE name = ?1",
             stateToUpdate.name,
             stateToUpdate.lastModified,
             stateToUpdate.locked,

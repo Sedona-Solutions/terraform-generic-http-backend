@@ -5,6 +5,8 @@ import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.Id
 
+const val DEFAULT_STATE_VERSION = 4
+const val DEFAULT_SERIAL = 1
 
 @Entity
 open class State {
@@ -19,11 +21,11 @@ open class State {
 
     open var lockInfo: String? = null
 
-    open var version: Int = 4
+    open var version: Int = DEFAULT_STATE_VERSION
 
     open var tfVersion: String? = null
 
-    open var serial: Int = 1
+    open var serial: Int = DEFAULT_SERIAL
 
     @Column(columnDefinition = "TEXT")
     open var state: String? = null

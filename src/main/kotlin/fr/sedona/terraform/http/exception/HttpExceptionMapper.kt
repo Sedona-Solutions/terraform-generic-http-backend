@@ -6,6 +6,8 @@ import javax.ws.rs.core.Response
 import javax.ws.rs.ext.ExceptionMapper
 import javax.ws.rs.ext.Provider
 
+const val LOCKED_STATUS_CODE = 423
+
 @Provider
 class HttpExceptionMapper : ExceptionMapper<RuntimeException> {
     private val logger = Logger.getLogger(TerraformStateResource::class.java)
@@ -28,7 +30,7 @@ class HttpExceptionMapper : ExceptionMapper<RuntimeException> {
                 .build()
 
             // 423 - Locked
-            is LockedException -> Response.status(423)
+            is LockedException -> Response.status(LOCKED_STATUS_CODE)
                 .entity(exception.lockInfo)
                 .build()
 

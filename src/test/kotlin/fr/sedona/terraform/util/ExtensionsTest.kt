@@ -73,7 +73,11 @@ class ExtensionsTest {
     }
 
     @Test
-    @DisplayName("Given nominal case (with lock), when converting TfState to internal, then returns the corresponding locked state")
+    @DisplayName(
+        "Given nominal case (with lock), " +
+                "when converting TfState to internal, " +
+                "then returns the corresponding locked state"
+    )
     fun testNominalCaseOnTfStateToInternal() {
         // Given
         val stringifiedLockInfo = objectMapper.writeValueAsString(testTfLockInfo)
@@ -90,7 +94,11 @@ class ExtensionsTest {
     }
 
     @Test
-    @DisplayName("Given no lock, when converting TfState to internal, then returns the corresponding unlocked state")
+    @DisplayName(
+        "Given no lock, " +
+                "when converting TfState to internal, " +
+                "then returns the corresponding unlocked state"
+    )
     fun testNoLockCaseOnTfStateToInternal() {
         // Given - nothing
 
@@ -106,7 +114,11 @@ class ExtensionsTest {
     }
 
     @Test
-    @DisplayName("Given nominal case (with lock), when converting TfState to internal (simple), then returns the corresponding locked state")
+    @DisplayName(
+        "Given nominal case (with lock), " +
+                "when converting TfState to internal (simple), " +
+                "then returns the corresponding locked state"
+    )
     fun testNominalCaseOnTfStateToInternalSimple() {
         // Given
         val stringifiedLockInfo = objectMapper.writeValueAsString(testTfLockInfo)
@@ -123,7 +135,11 @@ class ExtensionsTest {
     }
 
     @Test
-    @DisplayName("Given no lock, when converting TfState to internal (simple), then returns the corresponding unlocked state")
+    @DisplayName(
+        "Given no lock, " +
+                "when converting TfState to internal (simple), " +
+                "then returns the corresponding unlocked state"
+    )
     fun testNoLockCaseOnTfStateToInternalSimple() {
         // Given - nothing
 
@@ -139,7 +155,11 @@ class ExtensionsTest {
     }
 
     @Test
-    @DisplayName("Given nominal case, when converting TfLockInfo to internal, then returns the lock info as string")
+    @DisplayName(
+        "Given nominal case, " +
+                "when converting TfLockInfo to internal, " +
+                "then returns the lock info as string"
+    )
     fun testNominalCaseOnTfLockInfoToInternal() {
         // Given
         val stringifiedLockInfo = objectMapper.writeValueAsString(testTfLockInfo)
@@ -151,7 +171,11 @@ class ExtensionsTest {
     }
 
     @Test
-    @DisplayName("Given nominal case, when ensuring is not locked, then just run")
+    @DisplayName(
+        "Given nominal case, " +
+                "when ensuring is not locked, " +
+                "then just run"
+    )
     fun testNominalCaseOnEnsureIsNotLocked() {
         // Given - nothing
 
@@ -162,7 +186,11 @@ class ExtensionsTest {
     }
 
     @Test
-    @DisplayName("Given state is locked, when ensuring is not locked, then throws state already locked exception")
+    @DisplayName(
+        "Given state is locked, " +
+                "when ensuring is not locked, " +
+                "then throws state already locked exception"
+    )
     fun testLockedCaseOnEnsureIsNotLocked() {
         // Given - nothing
 
@@ -177,7 +205,11 @@ class ExtensionsTest {
     }
 
     @Test
-    @DisplayName("Given nominal case, when ensuring is locked, then just run")
+    @DisplayName(
+        "Given nominal case, " +
+                "when ensuring is locked, " +
+                "then just run"
+    )
     fun testNominalCaseOnEnsureIsLocked() {
         // Given - nothing
 
@@ -188,7 +220,11 @@ class ExtensionsTest {
     }
 
     @Test
-    @DisplayName("Given state is unlocked, when ensuring is locked, then throws state not locked exception")
+    @DisplayName(
+        "Given state is unlocked, " +
+                "when ensuring is locked, " +
+                "then throws state not locked exception"
+    )
     fun testUnlockedCaseOnEnsureIsLocked() {
         // Given - nothing
 
@@ -199,7 +235,11 @@ class ExtensionsTest {
     }
 
     @Test
-    @DisplayName("Given nominal case, when ensuring lock ownership, then just run")
+    @DisplayName(
+        "Given nominal case, " +
+                "when ensuring lock ownership, " +
+                "then just run"
+    )
     fun testNominalCaseOnEnsureLockOwnership() {
         // Given - nothing
 
@@ -210,7 +250,11 @@ class ExtensionsTest {
     }
 
     @Test
-    @DisplayName("Given state is locked by someone else, when ensuring lock ownership, then throws state lock mismatch exception")
+    @DisplayName(
+        "Given state is locked by someone else, " +
+                "when ensuring lock ownership, " +
+                "then throws state lock mismatch exception"
+    )
     fun testLockMismatchedCaseOnEnsureLockOwnership() {
         // Given
         val anotherLockId = "another-lock-id"

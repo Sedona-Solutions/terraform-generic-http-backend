@@ -19,11 +19,12 @@ import kotlin.collections.ArrayList
  * Service for State management in Elasticsearch using low level REST client.
  *
  * <p>
- *     Compared to High Level REST client, this service is version agnostic, being based on very simple and stable endpoints.
+ *     Compared to High Level REST client, this service is version agnostic,
+ *     being based on very simple and stable endpoints.
  * </p>
  */
 @ApplicationScoped
-class ElasticsearchStateService (
+class ElasticsearchStateService(
     private val restClient: RestClient,
     private val objectMapper: ObjectMapper
 ) {
@@ -32,7 +33,10 @@ class ElasticsearchStateService (
     @ConfigProperty(name = "quarkus.elasticsearch.index.name", defaultValue = "state")
     lateinit var indexName: String;
 
-    @ConfigProperty(name = "quarkus.elasticsearch.index.settings", defaultValue = "{\"settings\":{\"number_of_replicas\":\"1\", \"number_of_shards\":\"3\"}}")
+    @ConfigProperty(
+        name = "quarkus.elasticsearch.index.settings",
+        defaultValue = "{\"settings\":{\"number_of_replicas\":\"1\", \"number_of_shards\":\"3\"}}"
+    )
     lateinit var indexSettings: String
 
     @ConfigProperty(name = "quarkus.elasticsearch.list.page-size", defaultValue = "500")
@@ -41,7 +45,7 @@ class ElasticsearchStateService (
     /**
      * see https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html#docs-index-api-response-body
      */
-    private val SUCCESS_UPDATE_RESULTS = listOf("created","updated")
+    private val SUCCESS_UPDATE_RESULTS = listOf("created", "updated")
 
     fun listAll(): List<State> {
         logger.debug("Listing all states")
@@ -55,7 +59,7 @@ class ElasticsearchStateService (
 
         val total = countAllStates()
 
-        if(total > pageSize.toInt()){
+        if (total > pageSize.toInt()) {
             val scrollId = responseBody.getString("_scroll_id")
             loopOnScroll(scrollId, total, results)
         }
@@ -77,7 +81,7 @@ class ElasticsearchStateService (
 
         val total = countAllStates()
 
-        if(total > pageSize){
+        if (total > pageSize) {
             val scrollId = responseBody.getString("_scroll_id")
             loopOnScroll(scrollId, total, results)
         }
@@ -97,10 +101,12 @@ class ElasticsearchStateService (
         val responseBody = EntityUtils.toString(response.entity)
         val updateResult = JsonObject(responseBody).getString("result");
 
-        if(updateResult in SUCCESS_UPDATE_RESULTS) {
+        if (updateResult in SUCCESS_UPDATE_RESULTS) {
             logger.info("State for project ${stateToUpdate.name} updated successfully : result => $updateResult")
         } else {
-            logger.info("State for project ${stateToUpdate.name} cannot be created nor updated : result => $updateResult")
+            logger.info(
+                "State for project ${stateToUpdate.name} cannot be created nor updated : result => $updateResult"
+            )
         }
     }
 
@@ -123,7 +129,7 @@ class ElasticsearchStateService (
         val response = restClient.performRequest(request)
         val responseBody = EntityUtils.toString(response.entity)
         val json = JsonObject(responseBody)
-        if(!json.getBoolean("acknowledged")) {
+        if (!json.getBoolean("acknowledged")) {
             throw Exception("failed deletion")
         }
     }
@@ -267,7 +273,7 @@ class ElasticsearchStateService (
      */
     private fun loopOnScroll(scrollId: String, total: Int, resultList: ArrayList<State>) {
         var pageIndex = 0;
-        while(total > (pageIndex+1)*pageSize.toInt()) {
+        while (total > (pageIndex + 1) * pageSize.toInt()) {
             pageIndex++
             logger.debug("Getting next page of states list results (index=$pageIndex / size=$pageSize)")
             val scrollRequest = Request("POST", "/_search/scroll?scroll=1m&scroll_id=$scrollId")

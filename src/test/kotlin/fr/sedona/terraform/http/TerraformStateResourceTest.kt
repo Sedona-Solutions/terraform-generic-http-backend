@@ -86,7 +86,9 @@ class TerraformStateResourceTest {
     }
 
     @Test
-    @DisplayName("Given nominal case, when listing states, then returns a list of states")
+    @DisplayName("Given nominal case, " +
+            "when listing states, " +
+            "then returns a list of states")
     fun testNominalCaseOnListStates() {
         // Given - nothing
 
@@ -102,7 +104,9 @@ class TerraformStateResourceTest {
     }
 
     @Test
-    @DisplayName("Given specified page index, when listing states, then returns the page index of 25 states")
+    @DisplayName("Given specified page index, " +
+            "when listing states, " +
+            "then returns the page index of 25 states")
     fun testSpecifiedPageIndexCaseOnListStates() {
         // Given
         val testPageIndex = 3
@@ -125,7 +129,9 @@ class TerraformStateResourceTest {
     }
 
     @Test
-    @DisplayName("Given specified page size, when listing states, then returns the 1st page of n states")
+    @DisplayName("Given specified page size, " +
+            "when listing states, " +
+            "then returns the 1st page of n states")
     fun testSpecifiedPageSizeCaseOnListStates() {
         // Given
         val testPageSize = 50
@@ -148,7 +154,9 @@ class TerraformStateResourceTest {
     }
 
     @Test
-    @DisplayName("Given specified page params, when listing states, then returns the n page of m states")
+    @DisplayName("Given specified page params, " +
+            "when listing states, " +
+            "then returns the n page of m states")
     fun testSpecifiedPageParamsCaseOnListStates() {
         // Given
         val testPageIndex = 5
@@ -172,7 +180,9 @@ class TerraformStateResourceTest {
     }
 
     @Test
-    @DisplayName("Given nominal case, when getting state, then returns the state")
+    @DisplayName("Given nominal case," +
+            "when getting state, " +
+            "then returns the state")
     fun testNominalCaseOnGetState() {
         // Given - nothing
 
@@ -186,7 +196,9 @@ class TerraformStateResourceTest {
     }
 
     @Test
-    @DisplayName("Given no element with specified id, when getting state, then throws resource not found exception")
+    @DisplayName("Given no element with specified id, " +
+            "when getting state, " +
+            "then throws resource not found exception")
     fun testNotFoundCaseOnGetState() {
         // Given
         every { storageAdapter.findById(any()) } throws ResourceNotFoundException(testProjectName)
@@ -203,7 +215,9 @@ class TerraformStateResourceTest {
     }
 
     @Test
-    @DisplayName("Given nominal case, when updating state, then returns an empty response with status OK")
+    @DisplayName("Given nominal case, " +
+            "when updating state, " +
+            "then returns an empty response with status OK")
     fun testNominalCaseOnUpdateState() {
         // Given - nothing
 
@@ -218,7 +232,9 @@ class TerraformStateResourceTest {
     }
 
     @Test
-    @DisplayName("Given correct lock, when updating state, then returns an empty response with status OK")
+    @DisplayName("Given correct lock, " +
+            "when updating state, " +
+            "then returns an empty response with status OK")
     fun testCorrectLockCaseOnUpdateState() {
         // Given - nothing
 
@@ -233,7 +249,9 @@ class TerraformStateResourceTest {
     }
 
     @Test
-    @DisplayName("Given state not locked but lock id specified, when updating state, then throws bad request exception")
+    @DisplayName("Given state not locked but lock id specified, " +
+            "when updating state, " +
+            "then throws bad request exception")
     fun testNotLockedCaseOnUpdateState() {
         // Given
         every { storageAdapter.updateWithLock(any(), any(), any()) } throws BadRequestException()
@@ -250,7 +268,9 @@ class TerraformStateResourceTest {
     }
 
     @Test
-    @DisplayName("Given state locked by someone else, when updating state, then throws locked exception")
+    @DisplayName("Given state locked by someone else, " +
+            "when updating state, " +
+            "then throws locked exception")
     fun testLockMismatchedCaseOnUpdateState() {
         // Given
         every { storageAdapter.updateWithLock(any(), any(), any()) } throws LockedException(testTfLockInfo)
@@ -268,7 +288,9 @@ class TerraformStateResourceTest {
     }
 
     @Test
-    @DisplayName("Given nominal case, when deleting state, then returns an empty response with status OK")
+    @DisplayName("Given nominal case, " +
+            "when deleting state, " +
+            "then returns an empty response with status OK")
     fun testNominalCaseOnDeleteState() {
         // Given - nothing
 
@@ -282,7 +304,9 @@ class TerraformStateResourceTest {
     }
 
     @Test
-    @DisplayName("Given no specified element, when deleting state, then throws resource not found exception")
+    @DisplayName("Given no specified element, " +
+            "when deleting state, " +
+            "then throws resource not found exception")
     fun testNoResourceCaseOnDeleteState() {
         // Given
         every { storageAdapter.delete(any()) } throws ResourceNotFoundException(testProjectName)
@@ -299,7 +323,9 @@ class TerraformStateResourceTest {
     }
 
     @Test
-    @DisplayName("Given state is locked, when deleting state, then throws locked exception")
+    @DisplayName("Given state is locked, " +
+            "when deleting state, " +
+            "then throws locked exception")
     fun testLockedCaseOnDeleteState() {
         // Given
         every { storageAdapter.delete(any()) } throws LockedException(testTfLockInfo)
@@ -316,7 +342,9 @@ class TerraformStateResourceTest {
     }
 
     @Test
-    @DisplayName("Given nominal case, when locking state, then returns an empty response with status OK")
+    @DisplayName("Given nominal case, " +
+            "when locking state, " +
+            "then returns an empty response with status OK")
     fun testNominalCaseOnLockState() {
         // Given - nothing
 
@@ -330,7 +358,9 @@ class TerraformStateResourceTest {
     }
 
     @Test
-    @DisplayName("Given state is locked, when locking state, then throws locked exception")
+    @DisplayName("Given state is locked, " +
+            "when locking state, " +
+            "then throws locked exception")
     fun testLockedCaseOnLockState() {
         // Given
         every { storageAdapter.lock(any(), any()) } throws LockedException(testTfLockInfo)
@@ -347,7 +377,9 @@ class TerraformStateResourceTest {
     }
 
     @Test
-    @DisplayName("Given nominal case, when locking state (alt), then returns an empty response with status OK")
+    @DisplayName("Given nominal case, " +
+            "when locking state (alt), " +
+            "then returns an empty response with status OK")
     fun testNominalCaseOnLockStateAlt() {
         // Given - nothing
 
@@ -361,7 +393,9 @@ class TerraformStateResourceTest {
     }
 
     @Test
-    @DisplayName("Given state is locked, when locking state (alt), then throws locked exception")
+    @DisplayName("Given state is locked, " +
+            "when locking state (alt), " +
+            "then throws locked exception")
     fun testLockedCaseOnLockStateAlt() {
         // Given
         every { storageAdapter.lock(any(), any()) } throws LockedException(testTfLockInfo)
@@ -378,7 +412,9 @@ class TerraformStateResourceTest {
     }
 
     @Test
-    @DisplayName("Given nominal case, when unlocking state, then returns an empty response with status OK")
+    @DisplayName("Given nominal case, " +
+            "when unlocking state, " +
+            "then returns an empty response with status OK")
     fun testNominalCaseOnUnlockState() {
         // Given - nothing
 
@@ -393,7 +429,9 @@ class TerraformStateResourceTest {
     }
 
     @Test
-    @DisplayName("Given no specified element, when unlocking state, then throws bad request exception")
+    @DisplayName("Given no specified element, " +
+            "when unlocking state, " +
+            "then throws bad request exception")
     fun testNoElementCaseOnUnlockState() {
         // Given
         every { storageAdapter.unlock(any(), any()) } throws BadRequestException()
@@ -410,7 +448,9 @@ class TerraformStateResourceTest {
     }
 
     @Test
-    @DisplayName("Given state is not locked, when unlocking state, then throws conflict exception")
+    @DisplayName("Given state is not locked, " +
+            "when unlocking state, " +
+            "then throws conflict exception")
     fun testNotLockedCaseOnUnlockState() {
         // Given
         every { storageAdapter.unlock(any(), any()) } throws ConflictException(testTfLockInfo)
@@ -428,7 +468,9 @@ class TerraformStateResourceTest {
     }
 
     @Test
-    @DisplayName("Given state is locked by someone else, when unlocking state, then throws locked exception")
+    @DisplayName("Given state is locked by someone else, " +
+            "when unlocking state, " +
+            "then throws locked exception")
     fun testLockMismatchCaseOnUnlockState() {
         // Given
         every { storageAdapter.unlock(any(), any()) } throws LockedException(testTfLockInfo)
@@ -446,7 +488,9 @@ class TerraformStateResourceTest {
     }
 
     @Test
-    @DisplayName("Given force unlock, when unlocking state, then returns an empty response with status OK")
+    @DisplayName("Given force unlock, " +
+            "when unlocking state, " +
+            "then returns an empty response with status OK")
     fun testForceUnlockCaseOnUnlockState() {
         // Given - nothing
 
@@ -461,7 +505,9 @@ class TerraformStateResourceTest {
     }
 
     @Test
-    @DisplayName("Given force unlock on no specified element, when unlocking state, then throws bad request exception")
+    @DisplayName("Given force unlock on no specified element, " +
+            "when unlocking state, " +
+            "then throws bad request exception")
     fun testNoElementForceUnlockCaseOnUnlockState() {
         // Given
         every { storageAdapter.forceUnlock(any()) } throws BadRequestException()
@@ -478,7 +524,9 @@ class TerraformStateResourceTest {
     }
 
     @Test
-    @DisplayName("Given nominal case, when unlocking state (alt), then returns an empty response with status OK")
+    @DisplayName("Given nominal case, " +
+            "when unlocking state (alt), " +
+            "then returns an empty response with status OK")
     fun testNominalCaseOnUnlockStateAlt() {
         // Given - nothing
 
@@ -493,7 +541,9 @@ class TerraformStateResourceTest {
     }
 
     @Test
-    @DisplayName("Given no specified element, when unlocking state (alt), then throws bad request exception")
+    @DisplayName("Given no specified element, " +
+            "when unlocking state (alt), " +
+            "then throws bad request exception")
     fun testNoElementCaseOnUnlockStateAlt() {
         // Given
         every { storageAdapter.unlock(any(), any()) } throws BadRequestException()
@@ -510,7 +560,9 @@ class TerraformStateResourceTest {
     }
 
     @Test
-    @DisplayName("Given state is not locked, when unlocking state (alt), then throws conflict exception")
+    @DisplayName("Given state is not locked, " +
+            "when unlocking state (alt), " +
+            "then throws conflict exception")
     fun testNotLockedCaseOnUnlockStateAlt() {
         // Given
         every { storageAdapter.unlock(any(), any()) } throws ConflictException(testTfLockInfo)
@@ -528,7 +580,9 @@ class TerraformStateResourceTest {
     }
 
     @Test
-    @DisplayName("Given state is locked by someone else, when unlocking state (alt), then throws locked exception")
+    @DisplayName("Given state is locked by someone else, " +
+            "when unlocking state (alt), " +
+            "then throws locked exception")
     fun testLockMismatchCaseOnUnlockStateAlt() {
         // Given
         every { storageAdapter.unlock(any(), any()) } throws LockedException(testTfLockInfo)
@@ -546,7 +600,9 @@ class TerraformStateResourceTest {
     }
 
     @Test
-    @DisplayName("Given force unlock, when unlocking state (alt), then returns an empty response with status OK")
+    @DisplayName("Given force unlock, " +
+            "when unlocking state (alt), " +
+            "then returns an empty response with status OK")
     fun testForceUnlockCaseOnUnlockStateAlt() {
         // Given - nothing
 
@@ -561,7 +617,9 @@ class TerraformStateResourceTest {
     }
 
     @Test
-    @DisplayName("Given force unlock on no specified element, when unlocking state (alt), then throws bad request exception")
+    @DisplayName("Given force unlock on no specified element, " +
+            "when unlocking state (alt), " +
+            "then throws bad request exception")
     fun testNoElementForceUnlockCaseOnUnlockStateAlt() {
         // Given
         every { storageAdapter.forceUnlock(any()) } throws BadRequestException()
