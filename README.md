@@ -4,10 +4,9 @@
 
 ## Description
 
-This project contains a simple and generic HTTP backend for Terraform. The backend can be configured to use different storage adapter: either a database, or an ElasticSearch cluster. The backend supports state locking.
+This project contains a simple and generic HTTP backend for [Terraform](https://www.terraform.io). The backend can be configured to use different storage adapter: either a database, or an ElasticSearch cluster. The backend supports state locking.
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
-If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
+This project is based on [Quarkus](https://quarkus.io), the Supersonic Subatomic Java Framework.
 
 ## Compatible storages
 
@@ -16,7 +15,7 @@ The backend can store the Terraform state using one of the following product:
 - MySQL _(using Hibernate ORM)_
 - PostgreSQL _(using Hibernate ORM)_
 - Microsoft SQL Server _(using Hibernate ORM)_
-- ElasticSearch _(using ES high-level REST client)_
+- ElasticSearch _(using ES low-level REST client)_
 
 ## How to...
 
@@ -96,8 +95,10 @@ If using only standard HTTP methods, the URLs are built the following way:
 ```
 # address
 <protocol>://<backend>/tf-state/<project>
+
 # lock_address
 <protocol>://<backend>/tf-state/<project>/lock
+
 # unlock_address
 <protocol>://<backend>/tf-state/<project>/unlock
 ```
@@ -115,3 +116,8 @@ _**REMARK**_
 
 The format of the project name (with or without the environment) is not preset. You can choose the format that suits your need the most. For example, at [Sedona](http://sedona.fr), we use the following format `<env>--<project name>`.
 
+## Extras
+
+### Setup HTTPS
+
+As the backend is based on Quarkus, you can find comments in `/src/main/resources/application.properties` or you can visit the [Quarkus HTTP reference page](https://quarkus.io/guides/http-reference#ssl)
