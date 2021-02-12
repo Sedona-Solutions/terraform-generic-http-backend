@@ -82,8 +82,10 @@ class ExtensionsTest {
         // Given
         val stringifiedLockInfo = objectMapper.writeValueAsString(testTfLockInfo)
 
-        // When / Then
+        // When
         val result = testTfState.toInternal(testProjectName, testLockId, stringifiedLockInfo, objectMapper)
+
+        // Then
         assertNotNull(result)
         assertEquals(testProjectName, result.name)
         assertEquals(testLockId, result.lockId)
@@ -102,8 +104,10 @@ class ExtensionsTest {
     fun testNoLockCaseOnTfStateToInternal() {
         // Given - nothing
 
-        // When / Then
+        // When
         val result = testTfState.toInternal(testProjectName, null, null, objectMapper)
+
+        // Then
         assertNotNull(result)
         assertEquals(testProjectName, result.name)
         assertNull(result.lockId)
@@ -123,8 +127,10 @@ class ExtensionsTest {
         // Given
         val stringifiedLockInfo = objectMapper.writeValueAsString(testTfLockInfo)
 
-        // When / Then
+        // When
         val result = testTfState.toInternal(testProjectName, testTfLockInfo, objectMapper)
+
+        // Then
         assertNotNull(result)
         assertEquals(testProjectName, result.name)
         assertEquals(testLockId, result.lockId)
@@ -143,8 +149,10 @@ class ExtensionsTest {
     fun testNoLockCaseOnTfStateToInternalSimple() {
         // Given - nothing
 
-        // When / Then
+        // When
         val result = testTfState.toInternal(testProjectName, null, objectMapper)
+
+        // Then
         assertNotNull(result)
         assertEquals(testProjectName, result.name)
         assertNull(result.lockId)
@@ -164,8 +172,10 @@ class ExtensionsTest {
         // Given
         val stringifiedLockInfo = objectMapper.writeValueAsString(testTfLockInfo)
 
-        // When / Then
+        // When
         val result = testTfLockInfo.toInternal(objectMapper)
+
+        // Then
         assertNotNull(result)
         assertEquals(stringifiedLockInfo, result)
     }
