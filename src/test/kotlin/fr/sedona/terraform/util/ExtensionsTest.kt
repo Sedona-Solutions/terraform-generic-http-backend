@@ -9,6 +9,8 @@ import fr.sedona.terraform.exception.StateLockMismatchException
 import fr.sedona.terraform.exception.StateNotLockedException
 import fr.sedona.terraform.http.model.TfLockInfo
 import fr.sedona.terraform.http.model.TfState
+import fr.sedona.terraform.storage.model.DEFAULT_SERIAL
+import fr.sedona.terraform.storage.model.DEFAULT_STATE_VERSION
 import fr.sedona.terraform.storage.model.State
 import io.mockk.junit5.MockKExtension
 import org.junit.jupiter.api.DisplayName
@@ -23,13 +25,11 @@ import kotlin.test.*
 class ExtensionsTest {
     private val testProjectName = "test-project"
     private val testLockId = "lock-id"
-    private val testVersion = 4
     private val testTfVersion = "0.14.0"
-    private val testSerial = 1
     private val testTfState = TfState(
-        version = testVersion,
+        version = DEFAULT_STATE_VERSION,
         tfVersion = testTfVersion,
-        serial = testSerial,
+        serial = DEFAULT_SERIAL,
         lineage = "",
         outputs = null,
         resources = null
@@ -88,9 +88,9 @@ class ExtensionsTest {
         assertEquals(testProjectName, result.name)
         assertEquals(testLockId, result.lockId)
         assertEquals(stringifiedLockInfo, result.lockInfo)
-        assertEquals(testVersion, result.version)
+        assertEquals(DEFAULT_STATE_VERSION, result.version)
         assertEquals(testTfVersion, result.tfVersion)
-        assertEquals(testSerial, result.serial)
+        assertEquals(DEFAULT_SERIAL, result.serial)
     }
 
     @Test
@@ -108,9 +108,9 @@ class ExtensionsTest {
         assertEquals(testProjectName, result.name)
         assertNull(result.lockId)
         assertNull(result.lockInfo)
-        assertEquals(testVersion, result.version)
+        assertEquals(DEFAULT_STATE_VERSION, result.version)
         assertEquals(testTfVersion, result.tfVersion)
-        assertEquals(testSerial, result.serial)
+        assertEquals(DEFAULT_SERIAL, result.serial)
     }
 
     @Test
@@ -129,9 +129,9 @@ class ExtensionsTest {
         assertEquals(testProjectName, result.name)
         assertEquals(testLockId, result.lockId)
         assertEquals(stringifiedLockInfo, result.lockInfo)
-        assertEquals(testVersion, result.version)
+        assertEquals(DEFAULT_STATE_VERSION, result.version)
         assertEquals(testTfVersion, result.tfVersion)
-        assertEquals(testSerial, result.serial)
+        assertEquals(DEFAULT_SERIAL, result.serial)
     }
 
     @Test
@@ -149,9 +149,9 @@ class ExtensionsTest {
         assertEquals(testProjectName, result.name)
         assertNull(result.lockId)
         assertNull(result.lockInfo)
-        assertEquals(testVersion, result.version)
+        assertEquals(DEFAULT_STATE_VERSION, result.version)
         assertEquals(testTfVersion, result.tfVersion)
-        assertEquals(testSerial, result.serial)
+        assertEquals(DEFAULT_SERIAL, result.serial)
     }
 
     @Test
