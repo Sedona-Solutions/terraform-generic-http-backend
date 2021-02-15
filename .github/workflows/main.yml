@@ -27,7 +27,7 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
 
       - name: Building and verifying package
-        run: mvn --batch-mode --update-snapshots clean package
+        run: mvn -X -e --batch-mode --update-snapshots clean package
 
       - name: Testing and publishing code coverage to CodeClimate
         uses: paambaati/codeclimate-action@v2.7.5
