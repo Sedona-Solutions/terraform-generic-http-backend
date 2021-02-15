@@ -3,6 +3,7 @@ package fr.sedona.terraform.storage.elasticsearch.service
 import com.fasterxml.jackson.databind.ObjectMapper
 import fr.sedona.terraform.http.model.TfLockInfo
 import fr.sedona.terraform.http.model.TfState
+import fr.sedona.terraform.storage.elasticsearch.exception.EsRequestNotAcknowledgedException
 import fr.sedona.terraform.storage.model.State
 import io.vertx.core.json.JsonObject
 import org.apache.http.util.EntityUtils
@@ -14,6 +15,11 @@ import org.jboss.logging.Logger
 import java.util.*
 import javax.enterprise.context.ApplicationScoped
 import kotlin.collections.ArrayList
+
+/**
+ * see https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html#docs-index-api-response-body
+ */
+private val SUCCESS_UPDATE_RESULTS = listOf("created", "updated")
 
 /**
  * Service for State management in Elasticsearch using low level REST client.
@@ -41,11 +47,6 @@ class ElasticsearchStateService(
 
     @ConfigProperty(name = "quarkus.elasticsearch.list.page-size", defaultValue = "500")
     lateinit var pageSize: String
-
-    /**
-     * see https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html#docs-index-api-response-body
-     */
-    private val SUCCESS_UPDATE_RESULTS = listOf("created", "updated")
 
     fun listAll(): List<State> {
         logger.debug("Listing all states")
@@ -130,7 +131,7 @@ class ElasticsearchStateService(
         val responseBody = EntityUtils.toString(response.entity)
         val json = JsonObject(responseBody)
         if (!json.getBoolean("acknowledged")) {
-            throw Exception("failed deletion")
+            throw EsRequestNotAcknowledgedException("failed deletion")
         }
     }
 
@@ -163,40 +164,6 @@ class ElasticsearchStateService(
 
         logger.info("State for project $project unlocked")
         return stateToUnlock
-    }
-
-    fun searchByName(name: String): List<State> {
-        return search("name", name)
-    }
-
-    private fun search(field: String, query: String): List<State> {
-        val request = Request("GET", "/$indexName/_search")
-
-        val queryJson = buildSearchQuery(field, query)
-
-        request.setJsonEntity(queryJson?.encode());
-
-        val response = restClient.performRequest(request)
-
-        val responseBody = EntityUtils.toString(response.entity)
-        val json = JsonObject(responseBody)
-        val hits = json.getJsonObject("hits").getJsonArray("hits")
-
-        val results: ArrayList<State> = ArrayList(hits.size())
-        for (i in 0 until hits.size()) {
-            val hit = hits.getJsonObject(i)
-            val state: State = hit.getJsonObject("_source").mapTo<State>(State::class.java)
-            results.add(state)
-        }
-        return results
-    }
-
-    private fun buildSearchQuery(field: String, query: String): JsonObject? {
-        //construct a JSON query like {"query": {"match": {"<field>": "<query>"}}
-        val termJson = JsonObject().put(field, query)
-        val matchJson = JsonObject().put("match", termJson)
-        val queryJson = JsonObject().put("query", matchJson)
-        return queryJson
     }
 
     fun createAndLock(project: String, lockInfo: TfLockInfo): State {
@@ -244,7 +211,7 @@ class ElasticsearchStateService(
 
     private fun createIndex() {
         val indexCreationRequest = Request("PUT", "/$indexName")
-        if (!indexSettings.isNullOrEmpty()) {
+        if (indexSettings.isNotEmpty()) {
             logger.info("Using settings $indexSettings to create Index $indexName")
             indexCreationRequest.setJsonEntity(indexSettings)
         }
@@ -252,7 +219,7 @@ class ElasticsearchStateService(
         val indexCreationResponseBody = EntityUtils.toString(indexCreationResponse.entity)
         val acknowledged = JsonObject(indexCreationResponseBody).getBoolean("acknowledged");
         if (!acknowledged) {
-            throw Exception("Cannot create $indexName index")
+            throw EsRequestNotAcknowledgedException("Cannot create $indexName index")
         }
         logger.info("Index $indexName created to store states")
     }
