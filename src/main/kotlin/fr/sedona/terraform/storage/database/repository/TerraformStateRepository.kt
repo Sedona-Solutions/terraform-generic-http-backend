@@ -66,13 +66,6 @@ class TerraformStateRepository(
         )
 
         // Create the default empty state
-        val state = State()
-        state.name = project
-        state.lastModified = Date()
-        state.locked = true
-        state.lockId = updatedLock.id!!
-        state.tfVersion = updatedLock.version
-        state.lockInfo = objectMapper.writeValueAsString(updatedLock)
         val defaultState = TfState(
             version = 4,
             tfVersion = updatedLock.version,
@@ -81,7 +74,15 @@ class TerraformStateRepository(
             outputs = null,
             resources = null
         )
-        state.state = objectMapper.writeValueAsString(defaultState)
+        val state = State(
+            name = project,
+            lastModified = Date(),
+            locked = true,
+            lockId = updatedLock.id,
+            tfVersion = updatedLock.version,
+            lockInfo = objectMapper.writeValueAsString(updatedLock),
+            state = objectMapper.writeValueAsString(defaultState)
+        )
         persist(state)
 
         logger.info("State for project $project created and locked")
@@ -89,7 +90,7 @@ class TerraformStateRepository(
     }
 
     @Transactional
-    fun lock(project: String, stateToUpdate: State, lockInfo: TfLockInfo): State {
+    fun lock(project: String, stateToLock: State, lockInfo: TfLockInfo): State {
         logger.debug("Locking state for project $project")
         // Update the locking path
         val updatedLock = lockInfo.copy(
@@ -97,29 +98,33 @@ class TerraformStateRepository(
         )
 
         // Update the existing state
-        stateToUpdate.lastModified = Date()
-        stateToUpdate.locked = true
-        stateToUpdate.lockId = updatedLock.id!!
-        stateToUpdate.tfVersion = updatedLock.version
-        stateToUpdate.lockInfo = objectMapper.writeValueAsString(updatedLock)
+        val stringifiedLockInfo = objectMapper.writeValueAsString(updatedLock)
+        val updatedAt = Date()
         update(
             "lastModified = ?2, locked = true, lockId = ?3, lockInfo = ?4 WHERE name = ?1",
-            project, Date(), lockInfo.id, objectMapper.writeValueAsString(updatedLock)
+            project, updatedAt, lockInfo.id, stringifiedLockInfo
         )
 
         logger.info("State for project $project locked")
-        return stateToUpdate
+        return stateToLock.copy(
+            lastModified = updatedAt,
+            locked = true,
+            lockId = updatedLock.id,
+            tfVersion = updatedLock.version,
+            lockInfo = stringifiedLockInfo
+        )
     }
 
     @Transactional
     fun unlock(project: String, stateToUnlock: State): State {
         logger.debug("Unlocking state for project $project")
-        stateToUnlock.locked = false
-        stateToUnlock.lockId = null
-        stateToUnlock.lockInfo = null
         update("locked = false, lockId = NULL, lockInfo = NULL WHERE name = ?1", project)
 
         logger.info("State for project $project unlocked")
-        return stateToUnlock
+        return stateToUnlock.copy(
+            locked = false,
+            lockId = null,
+            lockInfo = null
+        )
     }
 }

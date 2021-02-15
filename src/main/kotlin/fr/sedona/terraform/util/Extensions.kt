@@ -16,17 +16,17 @@ fun TfState.toInternal(
     lockInfo: String?,
     objectMapper: ObjectMapper
 ): State {
-    val state = State()
-    state.name = project
-    state.lastModified = Date()
-    state.locked = lockInfo != null
-    state.lockId = lockId
-    state.lockInfo = lockInfo
-    state.version = this.version
-    state.tfVersion = this.tfVersion
-    state.serial = this.serial
-    state.state = objectMapper.writeValueAsString(this)
-    return state
+    return State(
+        name = project,
+        lastModified = Date(),
+        locked = lockInfo != null,
+        lockId = lockId,
+        lockInfo = lockInfo,
+        version = this.version,
+        tfVersion = this.tfVersion,
+        serial = this.serial,
+        state = objectMapper.writeValueAsString(this)
+    )
 }
 
 fun TfState.toInternal(

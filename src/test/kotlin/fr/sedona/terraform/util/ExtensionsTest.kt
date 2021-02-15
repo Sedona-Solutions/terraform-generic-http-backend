@@ -44,9 +44,22 @@ class ExtensionsTest {
         path = "test-project"
     )
     private val objectMapper = ObjectMapper()
+    private val testStringifiedLockInfo = objectMapper.writeValueAsString(testTfLockInfo)
+    private val testUnlockedState = State(
+        name = testProjectName,
+        lastModified = Date(),
+        lockId = null,
+        lockInfo = null,
+        locked = false
+    )
+    private val testLockedState = State(
+        name = testProjectName,
+        lastModified = Date(),
+        lockId = testLockId,
+        lockInfo = testStringifiedLockInfo,
+        locked = true
+    )
 
-    private lateinit var testUnlockedState: State
-    private lateinit var testLockedState: State
 
     @BeforeTest
     fun setup() {
@@ -54,22 +67,6 @@ class ExtensionsTest {
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
         objectMapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
         objectMapper.registerKotlinModule()
-
-        // Init unlocked state
-        testUnlockedState = State()
-        testUnlockedState.name = testProjectName
-        testUnlockedState.lastModified = Date()
-        testUnlockedState.lockId = null
-        testUnlockedState.lockInfo = null
-        testUnlockedState.locked = false
-
-        // Init locked state
-        testLockedState = State()
-        testLockedState.name = testProjectName
-        testLockedState.lastModified = Date()
-        testLockedState.lockId = testLockId
-        testLockedState.lockInfo = objectMapper.writeValueAsString(testTfLockInfo)
-        testLockedState.locked = true
     }
 
     @Test
@@ -79,17 +76,16 @@ class ExtensionsTest {
                 "then returns the corresponding locked state"
     )
     fun testNominalCaseOnTfStateToInternal() {
-        // Given
-        val stringifiedLockInfo = objectMapper.writeValueAsString(testTfLockInfo)
+        // Given - nothing
 
         // When
-        val result = testTfState.toInternal(testProjectName, testLockId, stringifiedLockInfo, objectMapper)
+        val result = testTfState.toInternal(testProjectName, testLockId, testStringifiedLockInfo, objectMapper)
 
         // Then
         assertNotNull(result)
         assertEquals(testProjectName, result.name)
         assertEquals(testLockId, result.lockId)
-        assertEquals(stringifiedLockInfo, result.lockInfo)
+        assertEquals(testStringifiedLockInfo, result.lockInfo)
         assertEquals(DEFAULT_STATE_VERSION, result.version)
         assertEquals(testTfVersion, result.tfVersion)
         assertEquals(DEFAULT_SERIAL, result.serial)
@@ -124,8 +120,7 @@ class ExtensionsTest {
                 "then returns the corresponding locked state"
     )
     fun testNominalCaseOnTfStateToInternalSimple() {
-        // Given
-        val stringifiedLockInfo = objectMapper.writeValueAsString(testTfLockInfo)
+        // Given - nothing
 
         // When
         val result = testTfState.toInternal(testProjectName, testTfLockInfo, objectMapper)
@@ -134,7 +129,7 @@ class ExtensionsTest {
         assertNotNull(result)
         assertEquals(testProjectName, result.name)
         assertEquals(testLockId, result.lockId)
-        assertEquals(stringifiedLockInfo, result.lockInfo)
+        assertEquals(testStringifiedLockInfo, result.lockInfo)
         assertEquals(DEFAULT_STATE_VERSION, result.version)
         assertEquals(testTfVersion, result.tfVersion)
         assertEquals(DEFAULT_SERIAL, result.serial)
@@ -169,15 +164,14 @@ class ExtensionsTest {
                 "then returns the lock info as string"
     )
     fun testNominalCaseOnTfLockInfoToInternal() {
-        // Given
-        val stringifiedLockInfo = objectMapper.writeValueAsString(testTfLockInfo)
+        // Given - nothing
 
         // When
         val result = testTfLockInfo.toInternal(objectMapper)
 
         // Then
         assertNotNull(result)
-        assertEquals(stringifiedLockInfo, result)
+        assertEquals(testStringifiedLockInfo, result)
     }
 
     @Test

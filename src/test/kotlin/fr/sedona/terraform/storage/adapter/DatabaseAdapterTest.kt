@@ -59,30 +59,25 @@ class DatabaseAdapterTest {
         who = "test@test.com",
         path = "test-project"
     )
+    private val testUnlockedState = State(
+        name = testProjectName,
+        lastModified = Date(),
+        lockId = null,
+        lockInfo = null,
+        locked = false
+    )
+    private val testLockedState = State(
+        name = testProjectName,
+        lastModified = Date(),
+        lockId = testLockId,
+        lockInfo = "{}",
+        locked = true
+    )
     private val defaultPageIndex = 1
     private val defaultPageSize = 25
 
-    private lateinit var testUnlockedState: State
-    private lateinit var testLockedState: State
-
     @BeforeTest
     fun setup() {
-        // Init unlocked state
-        testUnlockedState = State()
-        testUnlockedState.name = testProjectName
-        testUnlockedState.lastModified = Date()
-        testUnlockedState.lockId = null
-        testUnlockedState.lockInfo = null
-        testUnlockedState.locked = false
-
-        // Init locked state
-        testLockedState = State()
-        testLockedState.name = testProjectName
-        testLockedState.lastModified = Date()
-        testLockedState.lockId = testLockId
-        testLockedState.lockInfo = "{}"
-        testLockedState.locked = true
-
         mockkStatic(
             "fr.sedona.terraform.util.ExtensionsKt"
         )

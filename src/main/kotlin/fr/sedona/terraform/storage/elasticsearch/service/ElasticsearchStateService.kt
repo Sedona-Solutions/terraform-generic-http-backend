@@ -135,7 +135,7 @@ class ElasticsearchStateService(
         }
     }
 
-    fun lock(project: String, stateToUpdate: State, lockInfo: TfLockInfo): State {
+    fun lock(project: String, stateToLock: State, lockInfo: TfLockInfo): State {
         logger.debug("Locking state for project $project")
 
         // Update the locking path
@@ -144,26 +144,30 @@ class ElasticsearchStateService(
         )
 
         // Update the existing state
-        stateToUpdate.lastModified = Date()
-        stateToUpdate.locked = true
-        stateToUpdate.lockId = updatedLock.id!!
-        stateToUpdate.tfVersion = updatedLock.version
-        stateToUpdate.lockInfo = objectMapper.writeValueAsString(updatedLock)
-        update(stateToUpdate)
+        val lockedState = stateToLock.copy(
+            lastModified = Date(),
+            locked = true,
+            lockId = updatedLock.id!!,
+            tfVersion = updatedLock.version,
+            lockInfo = objectMapper.writeValueAsString(updatedLock)
+        )
+        update(lockedState)
 
         logger.info("State for project $project locked")
-        return stateToUpdate
+        return lockedState
     }
 
     fun unlock(project: String, stateToUnlock: State): State {
         logger.debug("Unlocking state for project $project")
-        stateToUnlock.locked = false
-        stateToUnlock.lockId = null
-        stateToUnlock.lockInfo = null
-        update(stateToUnlock)
+        val unlockedState = stateToUnlock.copy(
+            locked = false,
+            lockId = null,
+            lockInfo = null
+        )
+        update(unlockedState)
 
         logger.info("State for project $project unlocked")
-        return stateToUnlock
+        return unlockedState
     }
 
     fun createAndLock(project: String, lockInfo: TfLockInfo): State {
@@ -174,13 +178,6 @@ class ElasticsearchStateService(
         )
 
         // Create the default empty state
-        val state = State()
-        state.name = project
-        state.lastModified = Date()
-        state.locked = true
-        state.lockId = updatedLock.id!!
-        state.tfVersion = updatedLock.version
-        state.lockInfo = objectMapper.writeValueAsString(updatedLock)
         val defaultState = TfState(
             version = 4,
             tfVersion = updatedLock.version,
@@ -189,7 +186,15 @@ class ElasticsearchStateService(
             outputs = null,
             resources = null
         )
-        state.state = objectMapper.writeValueAsString(defaultState)
+        val state = State(
+            name = project,
+            lastModified = Date(),
+            locked = true,
+            lockId = updatedLock.id!!,
+            tfVersion = updatedLock.version,
+            lockInfo = objectMapper.writeValueAsString(updatedLock),
+            state = objectMapper.writeValueAsString(defaultState)
+        )
         update(state)
 
         logger.info("State for project $project created and locked")
